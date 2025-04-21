@@ -18,6 +18,7 @@ class Slime {
         this.velocidad = 1;
 
         this.juego.app.stage.addChild(graficos);  
+        
                         
     }
     asignarVelocidad(nuevaVelocidad){
@@ -54,6 +55,7 @@ class Slime {
         this.position.y += this.vel.y * this.juego.delta;
     }
     aplicarFuerzaQueMeLlevaAlMouse(){
+        this.verificarColisionConSlimesMalos();
         if(this.juego.mousePos === undefined) return;
 
         //console.log(this.position,this.juego.mousePos);
@@ -95,11 +97,24 @@ class Slime {
                 i--;
             }
         }
+
+    
     }
     render(){
         this.sprite.x = this.position.x;
         this.sprite.y = this.position.y;
     }
+    verificarColisionConSlimesMalos() {
+        for (let i = 0; i < this.juego.slimesMalos.length; i++) {
+          const malo = this.juego.slimesMalos[i];
+          if (distancia(this.position, malo.position) < this.radio + malo.radio) {
+            this.juego.slimesMalos.splice(i, 1);
+            malo.destroy();
+            this.juego.perderVida();
+            break;
+          }
+        }
+      }
 }
 
 class SlimeTonto {
@@ -180,3 +195,38 @@ class SlimeTonto {
         this.sprite.destroy();
     }
 }
+class SlimeMalo {
+    constructor(x, y, radio, juego) {
+      this.position = { x, y };
+      this.radio = radio;
+      this.juego = juego;
+  
+      this.sprite = new PIXI.Graphics()
+        .circle(0, 0, this.radio)
+        .fill({ color: 0x0000ff }); // AZUL
+  
+      this.juego.app.stage.addChild(this.sprite);
+  
+      this.direccion = normalizar(Math.random() * 2 - 1, Math.random() * 2 - 1);
+      this.velocidad = 0.7;
+    }
+  
+    update() {
+      this.position.x += this.direccion.x * this.juego.delta * this.velocidad;
+      this.position.y += this.direccion.y * this.juego.delta * this.velocidad;
+  
+      // Rebote contra bordes
+      if (this.position.x < 0 || this.position.x > this.juego.ancho) this.direccion.x *= -1;
+      if (this.position.y < 0 || this.position.y > this.juego.alto) this.direccion.y *= -1;
+    }
+  
+    render() {
+      this.sprite.x = this.position.x;
+      this.sprite.y = this.position.y;
+    }
+  
+    destroy() {
+      this.sprite.destroy();
+    }
+  }
+  

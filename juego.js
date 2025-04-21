@@ -1,8 +1,8 @@
 class Juego {
   constructor() {
     this.app = new PIXI.Application();
-    this.ancho = 800;
-    this.alto = 800;
+    this.ancho = 2000;
+    this.alto = 2000;
 
     this.mouse = { x: 0, y: 0 };
 
@@ -19,7 +19,11 @@ class Juego {
     this.app.init({width: this.ancho, height: this.alto }).then(() => {
       this.pixiListo();
     });
-    
+    this.slimesMalos = [];
+    this.vidas = 3;
+    this.corazones = [];
+    this.slimesComidos = 0;
+    this.contadorTexto = null;
   }
 
   pixiListo() {
@@ -33,11 +37,25 @@ class Juego {
 
     this.ponerSlime();
 
-    this.ponerSlimesTontos(5);
+    this.ponerSlimesTontos(200);
 
     this.app.ticker.add(() => this.gameLoop());
 
-    
+    this.ponerSlimesMalos(10);
+    this.dibujarCorazones();
+    this.contadorTexto = new PIXI.Text("Comidos: 0", {
+      fill: 0xffffff,
+      fontSize: 24,
+    });
+    this.contadorTexto.x = 20;
+    this.contadorTexto.y = 50;
+    this.app.stage.addChild(this.contadorTexto);
+  }
+  ponerSlimesMalos(cantidad) {
+    for (let i = 0; i < cantidad; i++) {
+      const malo = new SlimeMalo(300 + i * 100, 300, 15, this);
+      this.slimesMalos.push(malo);
+    }
   }
 
   ponerEventListeners() {
@@ -62,6 +80,10 @@ class Juego {
     for (let i = 0; i < this.slimeTontos.length; i++) {
       this.slimeTontos[i].render();
     }
+    for (let i = 0; i < this.slimesMalos.length; i++) {
+      this.slimesMalos[i].update();
+      this.slimesMalos[i].render();
+    }
   }
   ponerSlime(){
     this.slime = new Slime(200, 200, 20, 10, this);
@@ -70,6 +92,33 @@ class Juego {
     for (let i = 0; i < cantidad; i++) {
       const slimeTonto = new SlimeTonto(400, 400, 20, 10, this);
       this.slimeTontos.push(slimeTonto);
+    }
+  }
+  ponerSlimesMalos(cantidad) {
+    for (let i = 0; i < cantidad; i++) {
+      const malo = new SlimeMalo(300 + i * 100, 300, 15, this);
+      this.slimesMalos.push(malo);
+    }
+  }
+  dibujarCorazones() {
+    for (let i = 0; i < 3; i++) {
+      const corazon = new PIXI.Graphics()
+        .circle(0, 0, 10)
+        .fill({ color: 0xff0000 });
+      corazon.x = 20 + i * 30;
+      corazon.y = 20;
+      this.app.stage.addChild(corazon);
+      this.corazones.push(corazon);
+    }
+  }
+  perderVida() {
+    this.vidas--;
+    if (this.vidas >= 0) {
+      this.corazones[this.vidas].visible = false;
+    }
+    if (this.vidas === 0) {
+      alert("¡Perdiste!");
+      this.app.stop();
     }
   }
 }
