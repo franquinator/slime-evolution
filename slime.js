@@ -1,5 +1,5 @@
 class Slime {
-
+    //HOLA
     constructor(posX,posY,radio,masa,juego){
         this.position = {x:posX, y:posY};
 
