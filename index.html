@@ -1,35 +1,73 @@
 <html>
-
 <head>
-    <script src="utils.js"></script>
-
-    <script src="https://pixijs.download/v8.3.4/pixi.min.js"></script>
-
-    <script src="slime.js"></script>
-
-    <script src="juego.js"></script>
-
+  <script src="utils.js"></script>
+  <script src="https://pixijs.download/v8.3.4/pixi.min.js"></script>
+  <script src="slime.js"></script>
+  <script src="juego.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background-color: #111;
+      font-family: sans-serif;
+    }
+    #menu {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      z-index: 10;
+    }
+    .boton {
+      background: #444;
+      padding: 15px 30px;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    .boton:hover {
+      background: #666;
+    }
+  </style>
 </head>
-
-
 <body>
 
+  <div id="menu">
+    <button class="boton" onclick="iniciarJuego()">JUGAR</button>
+    <button class="boton" onclick="mostrarOpciones()">OPCIONES</button>
+    <button class="boton" onclick="mostrarTutorial()">TUTORIAL</button>
+    <button class="boton" onclick="cerrarJuego()">SALIR</button>
+  </div>
 
+  <script>
+    function iniciarJuego() {
+      document.getElementById("menu").style.display = "none";
+      const juego = new Juego();
+    }
 
+    function mostrarOpciones() {
+      alert("Por ahora no hay opciones configuradas.");
+    }
 
-    <script>
+    function mostrarTutorial() {
+      alert("Sos un slime que debe comer slimes rojos para crecer. Evitá a los slimes azules o perderás vida. ¡Usá el mouse para moverte!");
+    }
 
+    function cerrarJuego() {
+      alert("Gracias por jugar :)");
+      window.close(); // No funciona en todos los navegadores, pero es decorativo
+    }
+  </script>
 
-
-
-        console.log("empieza de cero")
-
-
-
-        const juego = new Juego()
-
-    </script>
 </body>
-
-
 </html>

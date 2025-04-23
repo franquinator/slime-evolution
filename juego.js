@@ -3,6 +3,8 @@ class Juego {
     this.app = new PIXI.Application();
     this.ancho = 2000;
     this.alto = 2000;
+    this.camara = { x: 0, y: 0 };
+    this.camaraCentro = { x: this.ancho / 2, y: this.alto / 2 };  
 
     this.mouse = { x: 0, y: 0 };
 
@@ -24,6 +26,9 @@ class Juego {
     this.corazones = [];
     this.slimesComidos = 0;
     this.contadorTexto = null;
+    this.hud = new PIXI.Container();
+    this.app.stage.addChild(this.hud);
+    
   }
 
   pixiListo() {
@@ -71,6 +76,7 @@ class Juego {
     this.delta = performance.now() - this.ultimoFrame;
     this.ultimoFrame = performance.now();
 
+    this.actualizarCamara();
     this.slime.update();
     this.slime.render();
 
@@ -84,6 +90,15 @@ class Juego {
       this.slimesMalos[i].update();
       this.slimesMalos[i].render();
     }
+  }
+  actualizarCamara() {
+    const objetivo = this.slime.position;
+  
+    this.camara.x = objetivo.x - this.camaraCentro.x;
+    this.camara.y = objetivo.y - this.camaraCentro.y;
+  
+    this.app.stage.x = -this.camara.x;
+    this.app.stage.y = -this.camara.y;
   }
   ponerSlime(){
     this.slime = new Slime(200, 200, 20, 10, this);
@@ -122,3 +137,4 @@ class Juego {
     }
   }
 }
+
