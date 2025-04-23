@@ -89,7 +89,8 @@ class Slime {
 
                 this.radio = radioNuevo;
 
-                console.log(this.sprite.scale.x);
+                this.juego.slimesComidos += 1;
+                this.juego.contadorTexto.text =  "Comidos: " + this.juego.slimesComidos;
 
                 this.juego.app.stage.removeChild(slimeTonto);
                 slimeTonto.destroy();
