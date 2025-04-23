@@ -15,11 +15,15 @@ class Slime {
 
         this.sprite = graficos;
 
-        this.velocidad = 1;
+        this.velocidad = 0.5;
 
-        this.juego.app.stage.addChild(graficos);  
+        this.juego.worldContainer.addChild(graficos);
+        this.sprite.zIndex = 11   
         
                         
+    }
+    posicionEnPantalla(){
+        return  this.juego.worldContainer.x + this.position.x
     }
     asignarVelocidad(nuevaVelocidad){
         this.vel.x = nuevaVelocidad.x;
@@ -38,7 +42,7 @@ class Slime {
         this.vel.y = 0;
     }
     update(){
-        this.verifecarColisiones()
+        //this.verifecarColisiones()
         this.aplicarFuerzaQueMeLlevaAlMouse();
         this.aplicarVelocidad();
     }
@@ -55,28 +59,26 @@ class Slime {
         this.position.y += this.vel.y * this.juego.delta;
     }
     aplicarFuerzaQueMeLlevaAlMouse(){
-        this.verificarColisionConSlimesMalos();
+        
         if(this.juego.mousePos === undefined) return;
 
         //console.log(this.position,this.juego.mousePos);
         //onsole.log(distancia(this.position,this.juego.mousePos));
 
-        if(distancia(this.position,this.juego.mousePos) < 10){
+        if(distancia(this.juego.centro,this.juego.mousePos) < 100){
             this.frenar();
-            this.position.x = this.juego.mousePos.x;
-            this.position.y = this.juego.mousePos.y;
             return;
         }
 
         const fuerza = getUnitVector(
             this.juego.mousePos,
-            this.position
-            
+            this.juego.centro
         );
 
         this.asignarVelocidad(fuerza.x * this.velocidad , fuerza.y * this.velocidad);
     }
     verifecarColisiones(){
+        this.verificarColisionConSlimesMalos();
         for (let i = 0; i < this.juego.slimeTontos.length; i++) {
             const slimeTonto = this.juego.slimeTontos[i];
             if(distancia(this.position,slimeTonto.position) < this.radio + slimeTonto.radio){
@@ -137,10 +139,11 @@ class SlimeTonto {
         .fill({color: 0xff0000});
 
         this.sprite = graficos;
+        this.sprite.zIndex = 9;
 
         this.velocidad = 0.5;
 
-        this.juego.app.stage.addChild(graficos);  
+        this.juego.worldContainer.addChild(graficos);  
 
         setInterval(() => {
             this.velocidad = Math.random() * 0.4 + 0.1;
@@ -205,8 +208,10 @@ class SlimeMalo {
       this.sprite = new PIXI.Graphics()
         .circle(0, 0, this.radio)
         .fill({ color: 0x0000ff }); // AZUL
+
+      this.sprite.zIndex = 10
   
-      this.juego.app.stage.addChild(this.sprite);
+      this.juego.worldContainer.addChild(this.sprite);   
   
       this.direccion = normalizar(Math.random() * 2 - 1, Math.random() * 2 - 1);
       this.velocidad = 0.7;

@@ -1,10 +1,13 @@
 class Juego {
   constructor() {
     this.app = new PIXI.Application();
-    this.ancho = 2000;
-    this.alto = 2000;
-    this.camara = { x: 0, y: 0 };
-    this.camaraCentro = { x: this.ancho / 2, y: this.alto / 2 };  
+    this.ancho = window.innerWidth;
+    this.alto = window.innerHeight;
+
+    this.centro = {
+      x:this.ancho/2,
+      y:this.alto/2
+    }
 
     this.mouse = { x: 0, y: 0 };
 
@@ -18,7 +21,7 @@ class Juego {
     this.ultimoFrame = 0;
     this.delta = 0;
 
-    this.app.init({width: this.ancho, height: this.alto }).then(() => {
+    this.app.init({width: this.ancho, height: this.alto}).then(() => {
       this.pixiListo();
     });
     this.slimesMalos = [];
@@ -34,20 +37,32 @@ class Juego {
   pixiListo() {
     console.log("pixi listo");
 
+    this.ponerCamara();
+
     document.body.appendChild(this.app.canvas);
 
     this.ponerEventListeners();
 
     window.__PIXI_APP__ = this.app;
 
+
+
     this.ponerSlime();
 
     this.ponerSlimesTontos(200);
 
-    this.app.ticker.add(() => this.gameLoop());
-
     this.ponerSlimesMalos(10);
+
     this.dibujarCorazones();
+    this.dibujarContador();
+
+
+    this.ponerFondo();
+
+    this.app.ticker.add(() => this.gameLoop());
+  }
+  
+  dibujarContador(){
     this.contadorTexto = new PIXI.Text("Comidos: 0", {
       fill: 0xffffff,
       fontSize: 24,
@@ -56,6 +71,16 @@ class Juego {
     this.contadorTexto.y = 50;
     this.app.stage.addChild(this.contadorTexto);
   }
+
+  ponerCamara(){
+    this.worldContainer = new PIXI.Container({
+      // this will make moving this container GPU powered
+      isRenderGroup: true,
+    });
+    this.worldSize = 5000;
+    this.app.stage.addChild(this.worldContainer);
+  }
+
   ponerSlimesMalos(cantidad) {
     for (let i = 0; i < cantidad; i++) {
       const malo = new SlimeMalo(300 + i * 100, 300, 15, this);
@@ -71,7 +96,9 @@ class Juego {
 
   cuandoSeMueveElMouse(evento) {
     this.mousePos = {x:evento.x, y:evento.y};
+    //this.mouseWorldPos = {x:evento.x - this.worldContainer.x,y:evento.y - this.worldContainer.y}
   }
+
   gameLoop() {
     this.delta = performance.now() - this.ultimoFrame;
     this.ultimoFrame = performance.now();
@@ -82,8 +109,6 @@ class Juego {
 
     for (let i = 0; i < this.slimeTontos.length; i++) {
       this.slimeTontos[i].update();
-    }
-    for (let i = 0; i < this.slimeTontos.length; i++) {
       this.slimeTontos[i].render();
     }
     for (let i = 0; i < this.slimesMalos.length; i++) {
@@ -91,30 +116,37 @@ class Juego {
       this.slimesMalos[i].render();
     }
   }
+
   actualizarCamara() {
-    const objetivo = this.slime.position;
-  
-    this.camara.x = objetivo.x - this.camaraCentro.x;
-    this.camara.y = objetivo.y - this.camaraCentro.y;
-  
-    this.app.stage.x = -this.camara.x;
-    this.app.stage.y = -this.camara.y;
+    const cuanto = 0.5;
+
+    const valorFinalX = -this.slime.position.x + this.ancho / 2;
+    const valorFinalY = -this.slime.position.y + this.alto / 2;
+
+    this.worldContainer.x -=
+      (this.worldContainer.x - valorFinalX) * cuanto;
+    this.worldContainer.y -=
+      (this.worldContainer.y - valorFinalY) * cuanto;
   }
+
   ponerSlime(){
-    this.slime = new Slime(200, 200, 20, 10, this);
+    this.slime = new Slime(1000, 1000, 20, 10, this);
   }
+
   ponerSlimesTontos(cantidad){
     for (let i = 0; i < cantidad; i++) {
       const slimeTonto = new SlimeTonto(400, 400, 20, 10, this);
       this.slimeTontos.push(slimeTonto);
     }
   }
+  
   ponerSlimesMalos(cantidad) {
     for (let i = 0; i < cantidad; i++) {
       const malo = new SlimeMalo(300 + i * 100, 300, 15, this);
       this.slimesMalos.push(malo);
     }
   }
+
   dibujarCorazones() {
     for (let i = 0; i < 3; i++) {
       const corazon = new PIXI.Graphics()
@@ -126,6 +158,7 @@ class Juego {
       this.corazones.push(corazon);
     }
   }
+
   perderVida() {
     this.vidas--;
     if (this.vidas >= 0) {
@@ -135,6 +168,17 @@ class Juego {
       alert("¡Perdiste!");
       this.app.stop();
     }
+  }
+
+  async ponerFondo() {
+    // Cargar la textura
+    let textura = await PIXI.Assets.load("bg.jpg");
+
+    // Crear el TilingSprite con la textura y dimensiones
+    this.fondo = new PIXI.TilingSprite(textura, this.ancho * 3, this.alto * 3);
+
+    // Añadir al escenario
+    this.worldContainer.addChild(this.fondo);
   }
 }
 
