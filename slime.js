@@ -235,27 +235,10 @@ class SlimeMalo {
       this.sprite.zIndex = 10
   
       this.juego.worldContainer.addChild(this.sprite);   
-  
-      this.direccion = normalizar(Math.random() * 2 - 1, Math.random() * 2 - 1);
-      this.velocidad = 0.7;
     }
   
     update() {
-      this.position.x += this.direccion.x * this.juego.delta * this.velocidad;
-      this.position.y += this.direccion.y * this.juego.delta * this.velocidad;
-  
-      // Rebote contra bordes
-      if (this.position.x < 0 || this.position.x > this.juego.ancho) this.direccion.x *= -1;
-      if (this.position.y < 0 || this.position.y > this.juego.alto) this.direccion.y *= -1;
-    }
-  
-    render() {
-      this.sprite.x = this.position.x;
-      this.sprite.y = this.position.y;
-    }
-  
-    destroy() {
-      this.sprite.destroy();
+      super.update();
     }
   }
   
