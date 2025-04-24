@@ -34,7 +34,7 @@ class Juego {
     
   }
 
-  pixiListo() {
+  async pixiListo() {
     console.log("pixi listo");
 
     this.ponerCamara();
@@ -45,19 +45,19 @@ class Juego {
 
     window.__PIXI_APP__ = this.app;
 
-
+    await this.ponerFondo();
 
     this.ponerSlime();
 
-    this.ponerSlimesTontos(200);
+    this.ponerSlimesTontos(100);
 
-    this.ponerSlimesMalos(10);
+    //this.ponerSlimesMalos(10);
 
     this.dibujarCorazones();
     this.dibujarContador();
 
 
-    this.ponerFondo();
+    
 
     this.app.ticker.add(() => this.gameLoop());
   }
@@ -130,12 +130,12 @@ class Juego {
   }
 
   ponerSlime(){
-    this.slime = new Slime(1000, 1000, 20, 10, this);
+    this.slime = new SlimeProta(1000, 1000, 20, this);
   }
 
   ponerSlimesTontos(cantidad){
     for (let i = 0; i < cantidad; i++) {
-      const slimeTonto = new SlimeTonto(400, 400, 20, 10, this);
+      const slimeTonto = new SlimeTonto(0, 0, 20, this);
       this.slimeTontos.push(slimeTonto);
     }
   }

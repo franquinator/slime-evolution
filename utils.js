@@ -15,10 +15,10 @@ function getUnitVector(objX, objY, mouseX, mouseY) {
     y: dy / length,
   };
 }
-function getUnitVector(posMouse, posObj) {
+function getUnitVector(posObj2, posObj) {
   // Paso 1: Vector dirección
-  let dx = posMouse.x - posObj.x;
-  let dy = posMouse.y - posObj.y;
+  let dx = posObj2.x - posObj.x;
+  let dy = posObj2.y - posObj.y;
 
   // Paso 2: Magnitud (longitud del vector)
   let length = Math.sqrt(dx * dx + dy * dy);
@@ -65,4 +65,7 @@ function normalizar(x,y){
     x: x / length,
     y: y / length,
   };
+}
+function clamp(valor, min, max) {
+  return Math.max(min, Math.min(max, valor));
 }

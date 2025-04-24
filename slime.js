@@ -1,37 +1,58 @@
-class Slime {
-    //HOLA
-    constructor(posX,posY,radio,masa,juego){
+class Slime{
+    constructor(posX,posY,radio,juego){
         this.position = {x:posX, y:posY};
 
         this.radio = radio; 
-        this.masa = masa;
         this.juego = juego;
 
         this.vel = {x:0, y:0};
-        
-        var graficos = new PIXI.Graphics()
-        .circle(0, 0, this.radio)
-        .fill({color: 0x00ff00});
+        this.aceleracion = {x:0, y:0};
 
-        this.sprite = graficos;
+        this.velocidadMax = 1;
+        this.MultiplicadorDeAceleracion = 0.1;
+        this.friccion = 0.90;
 
-        this.velocidad = 0.5;
-
-        this.juego.worldContainer.addChild(graficos);
-        this.sprite.zIndex = 11   
-        
-                        
     }
-    posicionEnPantalla(){
-        return  this.juego.worldContainer.x + this.position.x
-    }
-    asignarVelocidad(nuevaVelocidad){
-        this.vel.x = nuevaVelocidad.x;
-        this.vel.y = nuevaVelocidad.y;
+    update(){
+        this.aplicarAceleracion();
+        this.aplicarFriccion();
+        this.aplicarVelocidad();
     }
     asignarVelocidad(x,y){
         this.vel.x = x;
         this.vel.y = y;
+    }
+
+    asignarAceleracion(x,y){
+        this.aceleracion.x = x;
+        this.aceleracion.y = y;
+    }
+
+    asignarAceleracionNormalizada(x,y){
+        const aceleracionNormalizada = normalizar(x,y);
+        this.aceleracion.x = x;
+        this.aceleracion.y = y;
+    }
+
+    asignarVelocidadNormalizada(x,y){
+        const velocidadNormalizada = normalizar(x,y);
+        //console.log(direcciónNormalizada);
+        this.vel.x = velocidadNormalizada.x;
+        this.vel.y = velocidadNormalizada.y;
+    }
+
+    aplicarAceleracion(){
+        if(velocidadLinear(this.vel.x,this.vel.y) < this.velocidadMax){
+            this.vel.x += this.aceleracion.x;
+            this.vel.y += this.aceleracion.y;
+        }
+    }
+    aplicarVelocidad() {
+        const delta = this.juego.delta;
+        const tamañoJuego = this.juego.fondo;
+    
+        this.position.x = clamp(this.position.x + this.vel.x * delta, 0, tamañoJuego.width);
+        this.position.y = clamp(this.position.y + this.vel.y * delta, 0, tamañoJuego.height);
     }
     irA(x,y){
         this.position.x = x;
@@ -40,33 +61,51 @@ class Slime {
     frenar(){
         this.vel.x = 0;
         this.vel.y = 0;
-    }
-    update(){
-        //this.verifecarColisiones()
-        this.aplicarFuerzaQueMeLlevaAlMouse();
-        this.aplicarVelocidad();
+        this.aceleracion.x = 0;
+        this.aceleracion.y = 0;
     }
     aplicarFriccion(){
-        this.vel.x *= 0.98;
-        this.vel.y *= 0.98;
-        if(vaMuyLento(vel)){
-            this.frenar();
-        }
+        this.vel.x *= this.friccion;
+        this.vel.y *= this.friccion;
     }
-    aplicarVelocidad(){
-        //console.log(this.position,this.vel);
-        this.position.x += this.vel.x * this.juego.delta;
-        this.position.y += this.vel.y * this.juego.delta;
+    render(){
+        this.sprite.x = this.position.x;
+        this.sprite.y = this.position.y;
     }
-    aplicarFuerzaQueMeLlevaAlMouse(){
-        
+    destroy(){
+        this.sprite.destroy();
+    }
+}
+class SlimeProta extends Slime{
+    //HOLA
+    constructor(posX,posY,radio,juego){
+        super(posX,posY,radio,juego);
+
+        var graficos = new PIXI.Graphics()
+        .circle(0, 0, this.radio)
+        .fill({color: 0x00ff00});
+
+        this.sprite = graficos;
+
+        this.juego.worldContainer.addChild(graficos);
+        this.sprite.zIndex = 11   
+    }
+    update(){
+        this.asignarFuerzaQueMeLlevaAlMouse();
+        super.update();
+        this.verifecarColisiones();
+    }
+
+
+    asignarFuerzaQueMeLlevaAlMouse(){
+        this.asignarAceleracion(0,0);
         if(this.juego.mousePos === undefined) return;
 
         //console.log(this.position,this.juego.mousePos);
         //onsole.log(distancia(this.position,this.juego.mousePos));
 
-        if(distancia(this.juego.centro,this.juego.mousePos) < 100){
-            this.frenar();
+        if(distancia(this.juego.centro,this.juego.mousePos) < 50){
+            //this.frenar();
             return;
         }
 
@@ -75,38 +114,24 @@ class Slime {
             this.juego.centro
         );
 
-        this.asignarVelocidad(fuerza.x * this.velocidad , fuerza.y * this.velocidad);
+        this.asignarAceleracionNormalizada(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
     }
     verifecarColisiones(){
-        this.verificarColisionConSlimesMalos();
+        //this.verificarColisionConSlimesMalos();
+        this.verificarColisionesConSlimesTontos();
+    }
+    verificarColisionesConSlimesTontos(){
         for (let i = 0; i < this.juego.slimeTontos.length; i++) {
             const slimeTonto = this.juego.slimeTontos[i];
             if(distancia(this.position,slimeTonto.position) < this.radio + slimeTonto.radio){
-                
-                var area = Math.PI * this.radio ** 2;
-                var area2 = Math.PI * slimeTonto.radio ** 2;
-                var radioNuevo = Math.sqrt((area + area2) / Math.PI);
-
-                this.sprite.setSize(radioNuevo * 2);
-
-                this.radio = radioNuevo;
-
-                this.juego.slimesComidos += 1;
-                this.juego.contadorTexto.text =  "Comidos: " + this.juego.slimesComidos;
-
-                this.juego.app.stage.removeChild(slimeTonto);
-                slimeTonto.destroy();
+                this.comer(slimeTonto);
+                //console.log("comi un slime tonto");
                 this.juego.slimeTontos.splice(i, 1);
                 i--;
             }
         }
+    }
 
-    
-    }
-    render(){
-        this.sprite.x = this.position.x;
-        this.sprite.y = this.position.y;
-    }
     verificarColisionConSlimesMalos() {
         for (let i = 0; i < this.juego.slimesMalos.length; i++) {
           const malo = this.juego.slimesMalos[i];
@@ -118,22 +143,36 @@ class Slime {
           }
         }
       }
+    comer(comida){
+        var area = Math.PI * this.radio ** 2;
+        var area2 = Math.PI * comida.radio ** 2;
+        this.radio = Math.sqrt((area + area2) / Math.PI);
+
+        this.sprite.setSize(this.radio * 2);
+
+        this.juego.slimesComidos += 1;
+        this.juego.contadorTexto.text =  "Comidos: " + this.juego.slimesComidos;
+
+        this.juego.app.stage.removeChild(comida);
+        comida.destroy();
+    }
 }
 
-class SlimeTonto {
+class SlimeTonto extends Slime{
 
-    constructor(posX,posY,radio,masa,juego){
-        this.position = {x:posX, y:posY};
+    constructor(posX,posY,radio,juego){
+        super(posX,posY,radio,juego);
 
-        this.radio = radio; 
-        this.masa = masa;
-        this.juego = juego;
+        this.velocidadMax = 0.8;
+        this.radioDeEscape = 300;
 
-        this.direction = {x:0, y:0};
-        console.log(Math.random() * 2 - 1);
-        this.asignarDireccion(Math.random() * 2 - 1,Math.random() * 2 - 1);
-        console.log(this.direction);
-        
+        this.puntoDeDestino = {x:Math.random() * this.juego.fondo.width,
+            y:Math.random() * this.juego.fondo.height};
+
+        const direccion = getUnitVector(this.puntoDeDestino,this.position);
+
+        this.asignarAceleracionNormalizada(direccion.x * this.MultiplicadorDeAceleracion,
+                        direccion.y * this.MultiplicadorDeAceleracion);
         const graficos = new PIXI.Graphics()
         .circle(0, 0, this.radio)
         .fill({color: 0xff0000});
@@ -141,63 +180,47 @@ class SlimeTonto {
         this.sprite = graficos;
         this.sprite.zIndex = 9;
 
-        this.velocidad = 0.5;
-
         this.juego.worldContainer.addChild(graficos);  
-
-        setInterval(() => {
-            this.velocidad = Math.random() * 0.4 + 0.1;
-        }, 1000);
-                        
-    }
-    asignarDireccion(x,y){
-        const direcciónNormalizada = normalizar(x,y);
-        //console.log(direcciónNormalizada);
-        this.direction.x = direcciónNormalizada.x;
-        this.direction.y = direcciónNormalizada.y;
     }
 
     update(){
-        
-        this.rebotar();
-        this.aplicarDireccion();
+        if(this.slimeMuyCerca()){
+            console.log("huyo");
+            this.huir();
+        }
+        else{
+            console.log("deambulo");
+            this.deambular();
+        }
+        super.update();
+    }
+    irA(x,y){
+        this.puntoDeDestino.x = x;
+        this.puntoDeDestino.y = y;
+    }
+    huir(){
+        const direccionDeHuida = getUnitVector(this.juego.slime.position,this.position);
+        this.asignarAceleracionNormalizada(
+            direccionDeHuida.x * -1 * this.MultiplicadorDeAceleracion,
+            direccionDeHuida.y * -1 * this.MultiplicadorDeAceleracion);
+    }
+    deambular(){
+        if(distancia(this.puntoDeDestino,this.position) < 10){
+            console.log("llegue");
+            this.puntoDeDestino = {x:Math.random() * this.juego.fondo.width,
+                                   y:Math.random() * this.juego.fondo.height};
+        }
+        const direccion = getUnitVector(this.puntoDeDestino,this.position);
+        this.asignarAceleracionNormalizada(direccion.x * this.MultiplicadorDeAceleracion,
+                                           direccion.y * this.MultiplicadorDeAceleracion);
     }
 
-    rebotar(){
-        if(this.position.y + this.radio > this.juego.alto || this.position.y - this.radio < 0){
-            this.direction.y *= -1;
-            if(this.position.y< 0){
-                this.position.y = 0;
-            }
-            if(this.position.y > this.juego.alto){
-                this.position.y = this.juego.alto;
-            }
-            //console.log("reboto"+ performance.now())
-        }
-        if(this.position.x + this.radio  > this.juego.ancho || this.position.x - this.radio  < 0){
-            this.direction.x *= -1;
-            if(this.position.x < 0){
-                this.position.x = 0;
-            }
-            if(this.position.x > this.juego.ancho){
-                this.position.x = this.juego.ancho;
-            }
-            //console.log("reboto"+ performance.now());
-        }
+    slimeMuyCerca(){
+        if(this.juego.slime === undefined) return false;
+        return distancia(this.position,this.juego.slime.position) < this.radioDeEscape;
     }
 
-    aplicarDireccion(){
-        //console.log(this.position,this.vel);
-        this.position.x += this.direction.x * this.juego.delta * this.velocidad;
-        this.position.y += this.direction.y * this.juego.delta * this.velocidad;
-    }
-    render(){
-        this.sprite.x = this.position.x;
-        this.sprite.y = this.position.y;
-    }
-    destroy(){
-        this.sprite.destroy();
-    }
+
 }
 class SlimeMalo {
     constructor(x, y, radio, juego) {
