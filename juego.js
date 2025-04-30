@@ -51,7 +51,7 @@ class Juego {
 
     this.ponerSlimesTontos(100);
 
-    //this.ponerSlimesMalos(10);
+    this.ponerSlimesMalos(5);
 
     this.dibujarCorazones();
     this.dibujarContador();

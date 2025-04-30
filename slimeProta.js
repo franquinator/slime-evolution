@@ -41,6 +41,7 @@ class SlimeProta extends Slime{
     verifecarColisiones(){
         //this.verificarColisionConSlimesMalos();
         this.verificarColisionesConSlimesTontos();
+        this.verificarColisionConSlimesMalos();
     }
     verificarColisionesConSlimesTontos(){
         for (let i = 0; i < this.juego.slimeTontos.length; i++) {
