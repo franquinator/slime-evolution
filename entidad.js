@@ -1,4 +1,4 @@
-class Slime{
+class Entidad{
     constructor(posX,posY,radio,juego){
         this.position = {x:posX, y:posY};
 
@@ -12,12 +12,42 @@ class Slime{
         this.MultiplicadorDeAceleracion = 0.1;
         this.friccion = 0.90;
 
+        this.sprite = new PIXI.Container();
+
+    }
+    async MostrarCollider(){
+        const collider = new PIXI.Graphics()
+        .circle(0, 0, this.radio)
+        .stroke({
+            width: 1,
+            color: 0x00ff00
+        });
+        collider.zIndex = 12; // Dibuja el círculo correctamente
+        collider.zIndex = 12;
+        this.sprite.addChild(collider);
+    }
+    async cargarSprite(ruta,subspriteOffset){
+        this.sprite = new PIXI.Container();
+        let textura = await PIXI.Assets.load(ruta);
+        
+        //this.MostrarCollider();
+
+
+        const subsprite = new PIXI.Sprite(textura);
+        subsprite.setSize(this.radio * 2 + subspriteOffset);
+        subsprite.anchor.set(0.5,0.5);
+        this.sprite.addChild(subsprite);
+        this.sprite.zIndex = 11;
+
+        this.juego.worldContainer.addChild(this.sprite);
+         
     }
     update(){
         this.aplicarAceleracion();
         this.aplicarFriccion();
         this.aplicarVelocidad();
     }
+    
     asignarVelocidad(x,y){
         this.vel.x = x;
         this.vel.y = y;

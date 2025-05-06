@@ -1,9 +1,9 @@
-class SlimeTonto extends Slime{
+class SlimeTonto extends Entidad{
 
     constructor(posX,posY,radio,juego){
         super(posX,posY,radio,juego);
 
-        this.velocidadMax = 0.8;
+        this.velocidadMax = 0.5;
         this.radioDeEscape = 300;
 
         this.puntoDeDestino = {x:Math.random() * this.juego.fondo.width,
@@ -13,30 +13,24 @@ class SlimeTonto extends Slime{
 
         this.asignarAceleracionNormalizada(direccion.x * this.MultiplicadorDeAceleracion,
                         direccion.y * this.MultiplicadorDeAceleracion);
-        const graficos = new PIXI.Graphics()
-        .circle(0, 0, this.radio)
-        .fill({color: 0xff0000});
-
-        this.sprite = graficos;
-        this.sprite.zIndex = 9;
-
-        this.juego.worldContainer.addChild(graficos);  
+        
+        let probabilidadDeSprite = Math.random();
+        if(probabilidadDeSprite < 0.5){
+            this.cargarSprite("Assets/Graficos/amoeba1.png",10);
+        }
+        else{
+            this.cargarSprite("Assets/Graficos/amoeba2.png",10);
+        }
     }
 
     update(){
         if(this.slimeMuyCerca()){
-            console.log("huyo");
             this.huir();
         }
         else{
-            console.log("deambulo");
             this.deambular();
         }
         super.update();
-    }
-    irA(x,y){
-        this.puntoDeDestino.x = x;
-        this.puntoDeDestino.y = y;
     }
     huir(){
         const direccionDeHuida = getUnitVector(this.juego.slime.position,this.position);
@@ -46,7 +40,6 @@ class SlimeTonto extends Slime{
     }
     deambular(){
         if(distancia(this.puntoDeDestino,this.position) < 10){
-            console.log("llegue");
             this.puntoDeDestino = {x:Math.random() * this.juego.fondo.width,
                                    y:Math.random() * this.juego.fondo.height};
         }
