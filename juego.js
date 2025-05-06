@@ -165,7 +165,7 @@ class Juego {
       this.corazones[this.vidas].visible = false;
     }
     if (this.vidas === 0) {
-      alert("¡Perdiste!");
+      alert("¡Perdiste! (Presiona 'R' para reiniciar)");
       this.app.stop();
     }
   }
@@ -180,5 +180,9 @@ class Juego {
     // Añadir al escenario
     this.worldContainer.addChild(this.fondo);
   }
+  
 }
+window.reiniciarJuego = function () {
+  location.reload(); // recarga la página para reiniciar todo
+};
 

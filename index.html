@@ -71,6 +71,13 @@
     //   alert("Gracias por jugar :)");
     //   window.close(); // No funciona en todos los navegadores, pero es decorativo
     // }
+    window.addEventListener('keydown', (e) => {
+     if (e.key.toLowerCase() === 'r') {
+        if (juego.vidas === 0) {
+        reiniciarJuego();
+      }
+  }
+});
   </script>
 
 </body>
