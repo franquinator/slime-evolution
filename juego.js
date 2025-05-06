@@ -77,13 +77,12 @@ class Juego {
       // this will make moving this container GPU powered
       isRenderGroup: true,
     });
-    this.worldSize = 5000;
     this.app.stage.addChild(this.worldContainer);
   }
 
   ponerSlimesMalos(cantidad) {
     for (let i = 0; i < cantidad; i++) {
-      const malo = new SlimeMalo(300 + i * 100, 300, 15, this);
+      const malo = new SlimeMalo(300 + i * 100, 300, 40, this);
       this.slimesMalos.push(malo);
     }
   }
@@ -128,8 +127,13 @@ class Juego {
     this.worldContainer.y -=
       (this.worldContainer.y - valorFinalY) * cuanto;
   }
+  
+  alejarCamara() {
+    this.worldContainer.scale.x -= 0.1;
+    this.worldContainer.scale.y -= 0.1;
+  }
 
-  ponerSlime(){
+  async ponerSlime(){
     this.slime = new SlimeProta(1000, 1000, 20, this);
   }
 
@@ -139,13 +143,7 @@ class Juego {
       this.slimeTontos.push(slimeTonto);
     }
   }
-  
-  ponerSlimesMalos(cantidad) {
-    for (let i = 0; i < cantidad; i++) {
-      const malo = new SlimeMalo(300 + i * 100, 300, 15, this);
-      this.slimesMalos.push(malo);
-    }
-  }
+
 
   dibujarCorazones() {
     for (let i = 0; i < 3; i++) {

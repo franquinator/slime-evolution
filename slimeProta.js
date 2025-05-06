@@ -1,21 +1,24 @@
-class SlimeProta extends Slime{
+class SlimeProta extends Entidad{
     //HOLA
     constructor(posX,posY,radio,juego){
         super(posX,posY,radio,juego);
 
-        var graficos = new PIXI.Graphics()
-        .circle(0, 0, this.radio)
-        .fill({color: 0x00ff00});
-
-        this.sprite = graficos;
-
-        this.juego.worldContainer.addChild(graficos);
-        this.sprite.zIndex = 11   
+        this.cargarSprite("Assets/Graficos/bacteria2.png",10);
     }
+
     update(){
+        //this.moverPupilasHaciaElMouse();
         this.asignarFuerzaQueMeLlevaAlMouse();
         super.update();
         this.verifecarColisiones();
+    }
+
+    moverOjos(){
+        if(this.juego.mousePos === undefined) return;
+        const distanciaAlMouse = distancia(this.position,this.juego.mousePos);
+        const direccion = getUnitVector(this.juego.mousePos,this.position);
+        const distanciaOjos = this.radio/2 + this.radio/4;
+        const distanciaPupilas = this.radio/2 + this.radio/8;
     }
 
 
@@ -72,6 +75,8 @@ class SlimeProta extends Slime{
         this.radio = Math.sqrt((area + area2) / Math.PI);
 
         this.sprite.setSize(this.radio * 2);
+
+        //this.juego.alejarCamara();
 
         this.juego.slimesComidos += 1;
         this.juego.contadorTexto.text =  "Comidos: " + this.juego.slimesComidos;

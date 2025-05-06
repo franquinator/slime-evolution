@@ -1,8 +1,8 @@
-class SlimeMalo extends Slime {
+class SlimeMalo extends Entidad {
   constructor(x, y, radio, juego) {
     super(x, y, radio, juego);
 
-    this.velocidadMax = 0.7;
+    this.velocidadMax = 0.3;
     this.radioDePersecucion = 300;
 
     this.puntoDeDestino = {
@@ -10,12 +10,7 @@ class SlimeMalo extends Slime {
       y: Math.random() * this.juego.fondo.height,
     };
 
-    this.sprite = new PIXI.Graphics()
-      .circle(0, 0, this.radio)
-      .fill({ color: 0x0000ff }); // azul
-
-    this.sprite.zIndex = 10;
-    this.juego.worldContainer.addChild(this.sprite);
+    this.cargarSprite("Assets/Graficos/bacteria1.png",40);
   }
 
   update() {
