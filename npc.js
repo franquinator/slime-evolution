@@ -1,5 +1,9 @@
 class Npc extends Entidad{
-
+    constructor(posX,posY,radio,juego,radioDeVision,velocidadMax){
+        super(posX,posY,radio,juego);
+        this.velocidadMax = velocidadMax;
+        this.radioDeEscape = radioDeVision;
+    }
 
     perseguirA(objetivo) {
         const dir = getUnitVector(objetivo.position, this.position);
@@ -15,7 +19,7 @@ class Npc extends Entidad{
             direccionDeHuida.y * -1 * this.MultiplicadorDeAceleracion);
     }
     deambular(){
-        if(distancia(this.puntoDeDestino,this.position) < 10 || this.puntoDeDestino === undefined){
+        if(this.puntoDeDestino === undefined || distancia(this.puntoDeDestino,this.position) < 10 ){
             this.puntoDeDestino = {x:Math.random() * this.juego.fondo.width,
                                    y:Math.random() * this.juego.fondo.height};
         }

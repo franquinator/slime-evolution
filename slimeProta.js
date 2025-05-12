@@ -2,15 +2,28 @@ class SlimeProta extends Entidad{
     //HOLA
     constructor(posX,posY,radio,juego){
         super(posX,posY,radio,juego);
+        this.tiempoDesdeUltimoDaño = 0;
 
         this.cargarSprite("Assets/Graficos/bacteria2.png",10);
     }
 
     update(){
-        //this.moverPupilasHaciaElMouse();
+        if(this.tiempoDesdeUltimoDaño > 0){
+            this.tiempoDesdeUltimoDaño -= this.juego.delta;
+        }
+         
         this.asignarFuerzaQueMeLlevaAlMouse();
         super.update();
         this.verifecarColisiones();
+    }
+    render(){
+        if(this.tiempoDesdeUltimoDaño > 0){
+            this.sprite.tint = 0xff0000;//cambiar a rojo
+        }
+        else{
+            this.sprite.tint = 0xffffff;
+        }
+        super.render();
     }
 
     moverOjos(){
@@ -24,15 +37,7 @@ class SlimeProta extends Entidad{
 
     asignarFuerzaQueMeLlevaAlMouse(){
         this.asignarAceleracion(0,0);
-        if(this.juego.mousePos === undefined) return;
-
-        //console.log(this.position,this.juego.mousePos);
-        //onsole.log(distancia(this.position,this.juego.mousePos));
-
-        if(distancia(this.juego.centro,this.juego.mousePos) < 50){
-            //this.frenar();
-            return;
-        }
+        if(this.juego.mousePos === undefined || distancia(this.juego.centro,this.juego.mousePos) < 50) return;
 
         const fuerza = getUnitVector(
             this.juego.mousePos,
@@ -42,33 +47,24 @@ class SlimeProta extends Entidad{
         this.asignarAceleracionNormalizada(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
     }
     verifecarColisiones(){
-        //this.verificarColisionConSlimesMalos();
-        this.verificarColisionesConSlimesTontos();
-        this.verificarColisionConSlimesMalos();
-    }
-    verificarColisionesConSlimesTontos(){
-        for (let i = 0; i < this.juego.slimeTontos.length; i++) {
-            const slimeTonto = this.juego.slimeTontos[i];
-            if(distancia(this.position,slimeTonto.position) < this.radio + slimeTonto.radio){
-                this.comer(slimeTonto);
-                //console.log("comi un slime tonto");
-                this.juego.slimeTontos.splice(i, 1);
-                i--;
+        for (let i = 0; i < this.juego.todasLasEntidades.length; i++){
+            const npcActual = this.juego.todasLasEntidades[i]
+            if(distancia(this.position,npcActual.position) < this.radio + npcActual.radio){
+                if(npcActual.radio <= this.radio){
+                    this.comer(npcActual);
+                    this.juego.todasLasEntidades.splice(i, 1);
+                    if(this.juego.todasLasEntidades==0){
+                        alert("Ganaste (Presiona 'F5' para reiniciar)");
+                    }
+                    i--;
+                }
+                else if(npcActual.radio > this.radio && this.tiempoDesdeUltimoDaño <= 0){
+                    this.juego.perderVida();
+                    this.tiempoDesdeUltimoDaño = 1000;
+                }
             }
         }
     }
-
-    verificarColisionConSlimesMalos() {
-        for (let i = 0; i < this.juego.slimesMalos.length; i++) {
-          const malo = this.juego.slimesMalos[i];
-          if (distancia(this.position, malo.position) < this.radio + malo.radio) {
-            this.juego.slimesMalos.splice(i, 1);
-            malo.destroy();
-            this.juego.perderVida();
-            break;
-          }
-        }
-      }
     comer(comida){
         var area = Math.PI * this.radio ** 2;
         var area2 = Math.PI * comida.radio ** 2;
@@ -76,10 +72,8 @@ class SlimeProta extends Entidad{
 
         this.sprite.setSize(this.radio * 2);
 
-        //this.juego.alejarCamara();
-
-        this.juego.slimesComidos += 1;
-        this.juego.contadorTexto.text =  "Comidos: " + this.juego.slimesComidos;
+        this.juego.comidaConseguida += 1;
+        this.juego.contadorDeComidaTexto.text =  "Comidos: " + this.juego.comidaConseguida;
 
         this.juego.app.stage.removeChild(comida);
         comida.destroy();

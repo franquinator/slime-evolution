@@ -29,9 +29,6 @@ class Entidad{
     async cargarSprite(ruta,subspriteOffset){
         this.sprite = new PIXI.Container();
         let textura = await PIXI.Assets.load(ruta);
-        
-        //this.MostrarCollider();
-
 
         const subsprite = new PIXI.Sprite(textura);
         subsprite.setSize(this.radio * 2 + subspriteOffset);

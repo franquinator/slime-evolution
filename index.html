@@ -3,11 +3,13 @@
   <script src="utils.js"></script>
   <script src="https://pixijs.download/v8.3.4/pixi.min.js"></script>
   <script src="entidad.js"></script>
+  <script src="npc.js"></script>
   <script src="slimeProta.js"></script>
-  <script src="slimeTonto.js"></script>
-  <script src="slimeMalo.js"></script>
+  <script src="npcPasivo.js"></script>
+  <script src="npcAgresivo.js"></script>
+  <script src="listaDeNpcs.js"></script>
   <script src="juego.js"></script>
-  <!-- <style>
+  <style>
     body {
       margin: 0;
       background-color: #111;
@@ -41,43 +43,36 @@
     .boton:hover {
       background: #666;
     }
-  </style> -->
+  </style>
 </head>
 <body>
 
-  <!-- <div id="menu">
+  <div id="menu">
     <button class="boton" onclick="iniciarJuego()">JUGAR</button>
     <button class="boton" onclick="mostrarOpciones()">OPCIONES</button>
     <button class="boton" onclick="mostrarTutorial()">TUTORIAL</button>
     <button class="boton" onclick="cerrarJuego()">SALIR</button>
-  </div> -->
+  </div>
 
   <script>
-    const juego = new Juego();
-    // function iniciarJuego() {
-    //   document.getElementById("menu").style.display = "none";
-    //   const juego = new Juego();
-    // }
+    function iniciarJuego() {
+      document.getElementById("menu").style.display = "none";
+      const juego = new Juego();
+    }
 
-    // function mostrarOpciones() {
-    //   alert("Por ahora no hay opciones configuradas.");
-    // }
+    function mostrarOpciones() {
+      alert("Por ahora no hay opciones configuradas.");
+    }
 
-    // function mostrarTutorial() {
-    //   alert("Sos un slime que debe comer slimes rojos para crecer. Evitá a los slimes azules o perderás vida. ¡Usá el mouse para moverte!");
-    // }
+    function mostrarTutorial() {
+      alert("Sos un slime que debe comer para crecer. Evitá a los virus o perderás vida. ¡Usá el mouse para moverte!");
+    }
 
-    // function cerrarJuego() {
-    //   alert("Gracias por jugar :)");
-    //   window.close(); // No funciona en todos los navegadores, pero es decorativo
-    // }
-    window.addEventListener('keydown', (e) => {
-     if (e.key.toLowerCase() === 'r') {
-        if (juego.vidas === 0) {
-        reiniciarJuego();
-      }
-  }
-});
+    function cerrarJuego() {
+      alert("Gracias por jugar :)");
+      window.close(); // No funciona en todos los navegadores, pero es decorativo
+    }
+    
   </script>
 
 </body>
