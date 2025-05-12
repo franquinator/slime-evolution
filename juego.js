@@ -97,17 +97,30 @@ class Juego {
     window.addEventListener('keydown', (evento) => {
       this.cuandoSePresionaUnaTecla(evento)
     });
+    window.addEventListener('wheel', (evento) => {
+      this.cuandoSeGiraLaRueda(evento);
+    }, { passive: false }/* arreglo con chatgpt */);
   }
 
   cuandoSeMueveElMouse(evento) {
     this.mousePos = {x:evento.x, y:evento.y};
+  }
+  cuandoSeGiraLaRueda(evento){
+    this.ajustarTamanioDeCamara(evento.deltaY / 1000);
+    console.log(evento.deltaY / 1000);
   }
 
   cuandoSePresionaUnaTecla(evento){
     if (evento.key.toLowerCase() === 'r' && this.vidas <= 0) {
       reiniciarJuego();
     }
+    if (evento.key.toLowerCase() === 'a') { // Tecla 'A' para alejar la cámara
+        this.ajustarTamanioDeCamara();
+    }
+
   }
+
+  
 
   gameLoop() {
     this.delta = performance.now() - this.ultimoFrame;
@@ -125,21 +138,46 @@ class Juego {
   }
 
   actualizarCamara() {
+    //ayudó chat gpt
     const cuanto = 0.5;
 
-    const valorFinalX = -this.slime.position.x + this.ancho / 2;
-    const valorFinalY = -this.slime.position.y + this.alto / 2;
+    // Considerar la escala actual del worldContainer
+    const escalaX = this.worldContainer.scale.x;
+    const escalaY = this.worldContainer.scale.y;
 
-    this.worldContainer.x -=
-      (this.worldContainer.x - valorFinalX) * cuanto;
-    this.worldContainer.y -=
-      (this.worldContainer.y - valorFinalY) * cuanto;
+    // Ajustar los valores finales en función de la escala
+    const valorFinalX = (-this.slime.position.x * escalaX) + (this.ancho / 2);
+    const valorFinalY = (-this.slime.position.y * escalaY) + (this.alto / 2);
+
+    // Suavizar el movimiento de la cámara
+    this.worldContainer.x -= (this.worldContainer.x - valorFinalX) * cuanto;
+    this.worldContainer.y -= (this.worldContainer.y - valorFinalY) * cuanto;
   }
   
-  alejarCamara() {
-    this.worldContainer.scale.x -= 0.1;
-    this.worldContainer.scale.y -= 0.1;
-  }
+  ajustarTamanioDeCamara(tamanioDeAumento) {
+    //ayudó chat gpt
+    const escalaMinima = 0.1; // Evitar que la escala sea demasiado pequeña
+    const escalaMaxima = 2;   // Evitar que la escala sea demasiado grande
+
+    // Nueva escala
+    const nuevaEscalaX = Math.max(escalaMinima, Math.min(this.worldContainer.scale.x + tamanioDeAumento, escalaMaxima));
+    const nuevaEscalaY = Math.max(escalaMinima, Math.min(this.worldContainer.scale.y + tamanioDeAumento, escalaMaxima));
+
+    // Calcular el cambio de escala
+    const factorCambioX = nuevaEscalaX / this.worldContainer.scale.x;
+    const factorCambioY = nuevaEscalaY / this.worldContainer.scale.y;
+
+    // Ajustar la posición para mantener el centro
+    const centroX = this.ancho / 2;
+    const centroY = this.alto / 2;
+
+    this.worldContainer.x = centroX - (centroX - this.worldContainer.x) * factorCambioX;
+    this.worldContainer.y = centroY - (centroY - this.worldContainer.y) * factorCambioY;
+
+    // Aplicar la nueva escala
+    this.worldContainer.scale.x = nuevaEscalaX;
+    this.worldContainer.scale.y = nuevaEscalaY;
+}
 
   dibujarCorazones() {
     for (let i = 0; i < 3; i++) {
