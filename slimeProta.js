@@ -4,8 +4,24 @@ class SlimeProta extends Entidad{
         super(posX,posY,radio,juego);
         this.tiempoDesdeUltimoDaño = 0;
 
-        this.cargarSprite("Assets/Graficos/bacteria2.png",10);
+       
+        this.cargarAnimacion();
     }
+    async cargarAnimacion() {
+    // Carga el spritesheet
+        const sheet = await PIXI.Assets.load("Assets/texture.json");
+
+        // Creamos la animación con los frames "move"
+        this.sprite = new PIXI.AnimatedSprite(sheet.animations["move"]);
+        this.sprite.animationSpeed = 0.15;
+        this.sprite.play();
+        this.sprite.anchor.set(0.5);
+        this.sprite.x = this.position.x;
+        this.sprite.y = this.position.y;
+
+    // Lo agregamos al mundo
+        this.juego.worldContainer.addChild(this.sprite);
+   }
 
     update(){
         if(this.tiempoDesdeUltimoDaño > 0){
@@ -16,7 +32,10 @@ class SlimeProta extends Entidad{
         super.update();
         this.verifecarColisiones();
     }
+
+
     render(){
+        
         if(this.tiempoDesdeUltimoDaño > 0){
             this.sprite.tint = 0xff0000;//cambiar a rojo
         }
