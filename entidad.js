@@ -12,7 +12,7 @@ class Entidad{
         this.MultiplicadorDeAceleracion = 0.1;
         this.friccion = 0.90;
 
-        this.sprite = new PIXI.Container();
+        this.container = new PIXI.Container();
 
     }
     async MostrarCollider(){
@@ -22,21 +22,21 @@ class Entidad{
             width: 1,
             color: 0x00ff00
         });
-        collider.zIndex = 12; // Dibuja el círculo correctamente
         collider.zIndex = 12;
-        this.sprite.addChild(collider);
+        collider.name = "collider";
+        this.container.addChild(collider);
     }
     async cargarSprite(ruta,subspriteOffset){
-        this.sprite = new PIXI.Container();
         let textura = await PIXI.Assets.load(ruta);
 
-        const subsprite = new PIXI.Sprite(textura);
-        subsprite.setSize(this.radio * 2 + subspriteOffset);
-        subsprite.anchor.set(0.5,0.5);
-        this.sprite.addChild(subsprite);
-        this.sprite.zIndex = 11;
+        this.sprite = new PIXI.Sprite(textura);
+        this.sprite.setSize(this.radio * 2 + subspriteOffset);
+        this.sprite.anchor.set(0.5,0.5);
 
-        this.juego.worldContainer.addChild(this.sprite);
+        this.container.addChild(this.sprite);
+        this.container.zIndex = 11;
+
+        this.juego.worldContainer.addChild(this.container);
          
     }
     update(){
@@ -63,7 +63,6 @@ class Entidad{
 
     asignarVelocidadNormalizada(x,y){
         const velocidadNormalizada = normalizar(x,y);
-        //console.log(direcciónNormalizada);
         this.vel.x = velocidadNormalizada.x;
         this.vel.y = velocidadNormalizada.y;
     }
@@ -96,10 +95,10 @@ class Entidad{
         this.vel.y *= this.friccion;
     }
     render(){
-        this.sprite.x = this.position.x;
-        this.sprite.y = this.position.y;
+        this.container.x = this.position.x;
+        this.container.y = this.position.y;
     }
     destroy(){
-        this.sprite.destroy();
+        this.container.destroy();
     }
 }
