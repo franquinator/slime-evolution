@@ -1,2 +1,2 @@
-# Giant Slime
-eres un slime verde que va creciendo alimentandose de slimes rojos
+# Giant Evolution
+eres un slime verde que va creciendo alimentandose de otras criaturas
