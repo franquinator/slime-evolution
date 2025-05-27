@@ -3,6 +3,10 @@ class Npc extends Entidad{
         super(posX,posY,radio,juego);
         this.velocidadMax = velocidadMax;
         this.radioDeEscape = radioDeVision;
+        this.distanciaAlJugador = 0;
+    }
+    update() {
+        super.update();
     }
 
     perseguirA(objetivo) {

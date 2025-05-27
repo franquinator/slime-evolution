@@ -57,9 +57,10 @@
   </div>
 
   <script>
+    var juego = null;
     function iniciarJuego() {
       document.getElementById("menu").style.display = "none";
-      const juego = new Juego();
+      juego = new Juego();
     }
 
     function mostrarOpciones() {
