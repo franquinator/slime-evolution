@@ -32,8 +32,23 @@ class Juego {
 
     this.hud = new PIXI.Container();
     this.app.stage.addChild(this.hud);
-    
+    this.fpsText = new PIXI.Text('FPS: 0', {
+      fontFamily: 'Arial',
+      fontSize: 20,
+      fill: 0xffffff,
+} );
+    this.fpsText.anchor.set(1, 0); // anclado arriba a la derecha
+    this.fpsText.position.set(window.innerWidth - 10, 10);
+    this.fpsText.zIndex = 1000;
+    this.app.stage.addChild(this.fpsText);
+
+    this.lastFpsUpdate = performance.now();
+    this.frameCount = 0;
+   
+  
+  
   }
+  
 
   async pixiListo() {
     console.log("pixi listo");
@@ -50,9 +65,9 @@ class Juego {
 
     this.ponerSlime();
 
-    this.ponerNpcs(Virus,5);
+    this.ponerNpcs(Virus,20);
 
-    this.ponerNpcs(Ameba,100);
+    this.ponerNpcs(Ameba,1000);
 
     this.dibujarCorazones();
     this.dibujarContador();
@@ -100,6 +115,13 @@ class Juego {
     window.addEventListener('wheel', (evento) => {
       this.cuandoSeGiraLaRueda(evento);
     }, { passive: false }/* arreglo con chatgpt */);
+    window.addEventListener('resize', () => {
+     this.ancho = window.innerWidth;
+     this.alto = window.innerHeight;
+     this.fpsText.position.set(this.ancho - 10, 10);
+  });
+
+
   }
 
   cuandoSeMueveElMouse(evento) {
@@ -135,6 +157,15 @@ class Juego {
       this.todasLasEntidades[i].update();
       this.todasLasEntidades[i].render();
     }
+    //se ven los fps
+    this.frameCount++;
+    const now = performance.now();
+    if (now - this.lastFpsUpdate >= 1000) {
+      const fps = this.frameCount;
+      this.fpsText.text = `FPS: ${fps}`;
+      this.lastFpsUpdate = now;
+      this.frameCount = 0;
+}
   }
 
   actualizarCamara() {
