@@ -100,23 +100,27 @@ class SlimeProta extends Entidad{
         this.asignarAceleracionNormalizada(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
     }
     verificarColisiones(){
-        for (let i = 0; i < this.juego.todasLasEntidades.length; i++){
-            const npcActual = this.juego.todasLasEntidades[i]
-            if(distancia(this.position,npcActual.position) < this.radio + npcActual.radio){
-                if(npcActual.radio <= this.radio){
-                    this.comer(npcActual);
-                    this.juego.todasLasEntidades.splice(i, 1);
-                    if(this.juego.todasLasEntidades==0){
-                        alert("Ganaste (Presiona 'F5' para reiniciar)");
-                    }
-                    i--;
-                }
-                else if(npcActual.radio > this.radio && this.tiempoDesdeUltimoDaño <= 0){
-                    this.juego.perderVida();
-                    this.tiempoDesdeUltimoDaño = 1000;
+    const posiblesColisiones = this.juego.quadtree.recuperar(this);
+    
+    for (let i = 0; i < posiblesColisiones.length; i++) {
+        const npcActual = posiblesColisiones[i];
+
+        if(distancia(this.position, npcActual.position) < this.radio + npcActual.radio){
+            if(npcActual.radio <= this.radio){
+                this.comer(npcActual);
+                const index = this.juego.todasLasEntidades.indexOf(npcActual);
+                if (index > -1) this.juego.todasLasEntidades.splice(index, 1);
+
+                if(this.juego.todasLasEntidades.length == 0){
+                    alert("Ganaste (Presiona 'F5' para reiniciar)");
                 }
             }
+            else if(npcActual.radio > this.radio && this.tiempoDesdeUltimoDaño <= 0){
+                this.juego.perderVida();
+                this.tiempoDesdeUltimoDaño = 1000;
+            }
         }
+    }
     }
     comer(comida){
         var area = Math.PI * this.radio ** 2;

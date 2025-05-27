@@ -3,6 +3,12 @@ class Juego {
     this.app = new PIXI.Application();
     this.ancho = window.innerWidth;
     this.alto = window.innerHeight;
+    this.quadtree = new Quadtree({
+      x: 0,
+      y: 0,
+      width: this.ancho * 3,  // o this.fondo.width si ya está cargado
+      height: this.alto * 3
+    });
 
     this.centro = {
       x:this.ancho/2,
@@ -65,9 +71,9 @@ class Juego {
 
     this.ponerSlime();
 
-    this.ponerNpcs(Virus,20);
+    this.ponerNpcs(Virus,100);
 
-    this.ponerNpcs(Ameba,1000);
+    this.ponerNpcs(Ameba,5000);
 
     this.dibujarCorazones();
     this.dibujarContador();
@@ -145,6 +151,11 @@ class Juego {
   
 
   gameLoop() {
+    //agrega quadrtree
+    this.quadtree.limpiar();
+    for (let entidad of this.todasLasEntidades) {
+      this.quadtree.insertar(entidad);
+    }
     this.delta = performance.now() - this.ultimoFrame;
     this.ultimoFrame = performance.now();
 
