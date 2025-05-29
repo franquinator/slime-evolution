@@ -123,13 +123,14 @@ class SlimeProta extends Entidad{
     }
     }
     comer(comida){
-        if(this.sprite === null ) return
+        if(this.sprite == null) return;
 
+        // //forma realista de sumas radios
+        // var area = Math.PI * this.radio ** 2;
+        // var area2 = Math.PI * comida.radio ** 2;
+        // this.radio = Math.sqrt((area + area2/10) / Math.PI);
 
-        var area = Math.PI * this.radio ** 2;
-        var area2 = Math.PI * comida.radio ** 2;
-        this.radio = Math.sqrt((area + area2) / Math.PI);
-
+        this.radio += comida.radio / 100;
         this.sprite.setSize(this.radio * this.scaleOffset);
 
         this.juego.comidaConseguida += 1;
