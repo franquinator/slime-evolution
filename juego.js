@@ -73,7 +73,7 @@ class Juego {
 
     this.ponerNpcs(Virus,10);
 
-    this.ponerNpcs(Ameba,1000);
+    this.ponerNpcs(Ameba,5000);
 
     this.dibujarCorazones();
     this.dibujarContador();
