@@ -71,9 +71,9 @@ class Juego {
 
     this.ponerSlime();
 
-    this.ponerNpcs(Virus,100);
+    this.ponerNpcs(Virus,10);
 
-    this.ponerNpcs(Ameba,5000);
+    this.ponerNpcs(Ameba,1000);
 
     this.dibujarCorazones();
     this.dibujarContador();

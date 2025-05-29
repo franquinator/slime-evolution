@@ -123,6 +123,9 @@ class SlimeProta extends Entidad{
     }
     }
     comer(comida){
+        if(this.sprite === null ) return
+
+
         var area = Math.PI * this.radio ** 2;
         var area2 = Math.PI * comida.radio ** 2;
         this.radio = Math.sqrt((area + area2) / Math.PI);
