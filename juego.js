@@ -13,7 +13,10 @@ class Juego {
     this.centro = {
       x:this.ancho/2,
       y:this.alto/2
+
+
     }
+    this.nivelActual = 1;
 
     this.mouse = { x: 0, y: 0 };
 

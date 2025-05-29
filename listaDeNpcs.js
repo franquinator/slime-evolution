@@ -17,3 +17,10 @@ class Virus extends NpcAgresivo{
         this.cargarSprite("Assets/Graficos/bacteria1.png",40);
     }
 }
+class Gato extends NpcAgresivo {
+    constructor(posX, posY, juego) {
+        super(posX, posY, 200, juego, 250, 0.4);
+        this.cargarSprite("Assets/Graficos/cat.png", 20);
+    }
+
+}

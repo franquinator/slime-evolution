@@ -134,9 +134,13 @@ class SlimeProta extends Entidad{
         this.sprite.setSize(this.radio * this.scaleOffset);
 
         this.juego.comidaConseguida += 1;
-        this.juego.contadorDeComidaTexto.text =  "Comidos: " + this.juego.comidaConseguida;
+        this.juego.contadorDeComidaTexto.text =  "Puntaje: " + this.juego.comidaConseguida;
 
         this.juego.app.stage.removeChild(comida);
         comida.destroy();
+        if(this.juego.comidaConseguida >= 10 && this.juego.nivelActual == 1){
+            this.juego.nivelActual = 2;
+            this.juego.ponerNpcs(Gato,10);
+        }
     }
 }
