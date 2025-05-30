@@ -13,6 +13,9 @@ class Juego {
       height: this.alto * 3
     });
 
+    //variables de spatial hash
+    this.spatialHash = new SpatialHash(100); // Tamaño de celda de 100 pixels
+    
     //variables de camara
     this.centro = {
       x: this.ancho / 2,
@@ -21,7 +24,7 @@ class Juego {
     this.mouse = { x: 0, y: 0 };
 
     //variables de cambio de nivel
-    this.nivelActual = 1;
+    this.nivelActual = 0;
 
     //variables de juego
     this.todasLasEntidades = [];
@@ -62,15 +65,15 @@ class Juego {
 
     this.ponerSlime();
 
-    this.ponerNpcs(Virus, 10);
-
-    this.ponerNpcs(Ameba, 2000);
+    this.cargarNivel1();
 
     //agrega elementos de PIXI
 
     window.__PIXI_APP__ = this.app;
 
     document.body.appendChild(this.app.canvas);
+
+    
 
     //comienza el gameloop
     this.app.ticker.add(() => this.gameLoop());
@@ -130,6 +133,14 @@ class Juego {
     if (key === 'r' && this.vidas <= 0) {
       reiniciarJuego();
     }
+    if (key === 'd') {
+      if(this.panelDeDebug.visible){
+        this.panelDeDebug.visible = false;
+      }
+      else{
+        this.panelDeDebug.visible = true;
+      }
+    }
   }
 
   //funciones de hud
@@ -141,6 +152,7 @@ class Juego {
     await this.dibujarCorazones();
     this.dibujarContador();
     this.dibujarContadorFps();
+    this.dibujarPanelDeDebug();
   }
 
   async dibujarCorazones() {
@@ -171,6 +183,21 @@ class Juego {
     this.fpsText.anchor.set(1, 0); // anclado arriba a la derecha
     this.fpsText.position.set(window.innerWidth - 10, 10);
     this.hud.addChild(this.fpsText);
+  }
+
+  dibujarPanelDeDebug() {
+    this.panelDeDebug = new PIXI.Container();
+    this.panelDeDebug.zIndex = 1000;
+    this.app.stage.addChild(this.panelDeDebug);
+
+    this.textoDeDebug = new PIXI.Text("Debug", {
+      fontFamily: 'Arial',
+      fontSize: 20,
+      fill: 0xffffff,
+    });
+    this.panelDeDebug.addChild(this.textoDeDebug);
+    this.panelDeDebug.position.set(this.ancho / 2, 0);
+    this.panelDeDebug.visible = false;
   }
   perderVida() {
     this.vidas--;
@@ -216,14 +243,23 @@ class Juego {
     }
   }
   sacarNpcs(clase) {
-    this.todasLasEntidades = this.todasLasEntidades.filter(entidad => !(entidad instanceof clase));
+    console.log("npc sacados");
+    for(let i = 0; i < this.todasLasEntidades.length; i++){
+      if(this.todasLasEntidades[i] instanceof clase){
+        this.app.stage.removeChild(this.todasLasEntidades[i]);
+        this.todasLasEntidades[i].destroy();
+        this.todasLasEntidades.splice(i, 1);
+        i--;
+      }
+    }
+    console.log(this.todasLasEntidades);
   }
 
   //funciones para cambiar de nivel
   cargarNivel1() {
     this.nivelActual++;
     this.ponerNpcs(Virus, 10);
-    this.ponerNpcs(Ameba, 2000);
+    this.ponerNpcs(Ameba, 10000);
   }
   cargarNivel2() {
     this.nivelActual++;
@@ -234,7 +270,7 @@ class Juego {
 
   //funciones de gameloop
   gameLoop() {
-    this.actualizarQuadtree();
+    this.actualizarSpatialHash();
     this.actualizarDeltaTime();
     this.actualizarCamara();
     this.actualizarContadorFps();
@@ -245,6 +281,12 @@ class Juego {
     this.quadtree.limpiar();
     for (let entidad of this.todasLasEntidades) {
       this.quadtree.insertar(entidad);
+    }
+  }
+  actualizarSpatialHash() {
+    this.spatialHash.limpiar();
+    for (const entidad of this.todasLasEntidades) {
+      this.spatialHash.actualizarPosicion(entidad);
     }
   }
 
@@ -291,6 +333,23 @@ class Juego {
       this.todasLasEntidades[i].update();
       this.todasLasEntidades[i].render();
     }
+  }
+  obtenerEntidadesCercanasSinOptimizar(entidad, radio) {
+    let entidadesCercanas = [];
+    for (let i = 0; i < this.todasLasEntidades.length; i++) {
+      if(this.todasLasEntidades[i] !== entidad){
+        if(distancia(this.todasLasEntidades[i].position, entidad.position) < radio){
+          entidadesCercanas.push(this.todasLasEntidades[i]);
+        }
+      }
+    }
+    return entidadesCercanas;
+  }
+  obtenerEntidadesCercanasQuadtree(entidad, radio) {
+    return this.quadtree.entidadesCercanas(entidad, radio);
+  }
+  obtenerEntidadesCercanasSpatialHash(entidad, radio) {
+    return this.spatialHash.entidadesCercanas(entidad, radio);
   }
 }
 

@@ -32,7 +32,7 @@ class Npc extends Entidad{
                                            direccion.y * this.MultiplicadorDeAceleracion);
     }
     estaA_DistaciaDe_(distacia,objetivo){
-        if(this.juego.slime === undefined) return false;
+        if(objetivo === undefined) return false;
         return distancia(this.position,objetivo.position) < distacia;
     }
 

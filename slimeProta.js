@@ -1,5 +1,4 @@
 class SlimeProta extends Entidad{
-    //HOLA
     constructor(posX,posY,radio,juego){
         super(posX,posY,radio,juego);
         this.tiempoDesdeUltimoDaño = 0;
@@ -9,6 +8,7 @@ class SlimeProta extends Entidad{
        
         this.cargarAnimacion();
     }
+
     async cargarAnimacion() {
         // Carga el spritesheet
         this.sheet = await PIXI.Assets.load("Assets/texture.json");
@@ -26,7 +26,7 @@ class SlimeProta extends Entidad{
 
         // Lo agregamos al mundo
         this.juego.worldContainer.addChild(this.container);
-   }
+    }
 
     update(){
         if(this.tiempoDesdeUltimoDaño > 0){
@@ -34,13 +34,13 @@ class SlimeProta extends Entidad{
         }
          
         this.asignarFuerzaQueMeLlevaAlMouse();
-        super.update();
         this.verificarColisiones();
+        super.update();
     }
 
 
     render(){
-
+        //efectoDeDaño();
         if(this.tiempoDesdeUltimoDaño > 0){
             this.container.tint = 0xff0000;//cambiar a rojo
         }
@@ -48,6 +48,7 @@ class SlimeProta extends Entidad{
             this.container.tint = 0xffffff;
         }
 
+        //cambioDeDireccion();
         if(this.vel.x > 0){
             this.container.scale.x = 1;
         }
@@ -55,10 +56,10 @@ class SlimeProta extends Entidad{
             this.container.scale.x = -1;
         }
 
+        //cambioDeAnimaciones();
         if(Math.abs(this.vel.x) < 0.1 && Math.abs(this.vel.y) < 0.1 && this.animacionActual !== "idle"){
             this.cambiarAnimacion("idle");
         }
-        
         if((Math.abs(this.vel.x) > 0.1 || Math.abs(this.vel.y) > 0.1) && this.animacionActual !== "move"){
             this.cambiarAnimacion("move");
         }
@@ -79,15 +80,6 @@ class SlimeProta extends Entidad{
         }
     }
 
-    moverOjos(){
-        if(this.juego.mousePos === undefined) return;
-        const distanciaAlMouse = distancia(this.position,this.juego.mousePos);
-        const direccion = getUnitVector(this.juego.mousePos,this.position);
-        const distanciaOjos = this.radio/2 + this.radio/4;
-        const distanciaPupilas = this.radio/2 + this.radio/8;
-    }
-
-
     asignarFuerzaQueMeLlevaAlMouse(){
         this.asignarAceleracion(0,0);
         if(this.juego.mousePos === undefined || distancia(this.juego.centro,this.juego.mousePos) < 50) return;
@@ -99,18 +91,19 @@ class SlimeProta extends Entidad{
 
         this.asignarAceleracionNormalizada(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
     }
-    verificarColisiones(){
-    const posiblesColisiones = this.juego.quadtree.recuperar(this);
-    
-    for (let i = 0; i < posiblesColisiones.length; i++) {
-        const npcActual = posiblesColisiones[i];
 
-        if(distancia(this.position, npcActual.position) < this.radio + npcActual.radio){
+    verificarColisiones(){
+        //const colisiones = this.juego.obtenerEntidadesCercanasSinOptimizar(this,this.radio);
+        //const colisiones = this.juego.obtenerEntidadesCercanasQuadtree(this,this.radio);
+        const colisiones = this.juego.obtenerEntidadesCercanasSpatialHash(this, this.radio);
+        //const posiblesColisiones = this.juego.quadtree.recuperar(this);
+
+        for (let i = 0; i < colisiones.length; i++) {
+            const npcActual = colisiones[i];
             if(npcActual.radio <= this.radio){
                 this.comer(npcActual);
                 const index = this.juego.todasLasEntidades.indexOf(npcActual);
                 if (index > -1) this.juego.todasLasEntidades.splice(index, 1);
-
                 if(this.juego.todasLasEntidades.length == 0){
                     alert("Ganaste (Presiona 'F5' para reiniciar)");
                 }
@@ -121,16 +114,17 @@ class SlimeProta extends Entidad{
             }
         }
     }
-    }
+
     comer(comida){
         if(this.sprite == null) return;
 
         //forma realista de sumas radios
-        var area = Math.PI * this.radio ** 2;
+/*         var area = Math.PI * this.radio ** 2;
         var area2 = Math.PI * comida.radio ** 2;
-        this.radio = Math.sqrt((area + area2) / Math.PI);
+        this.radio = Math.sqrt((area + area2) / Math.PI); */
+        let crecimiento = comida.radio / this.radio;
 
-        //this.radio += comida.radio * 10;
+        this.radio += crecimiento;
         this.sprite.setSize(this.radio * this.scaleOffset);
 
         this.juego.comidaConseguida += 1;
@@ -138,9 +132,10 @@ class SlimeProta extends Entidad{
 
         this.juego.app.stage.removeChild(comida);
         comida.destroy();
-        if(this.juego.comidaConseguida >= 10 && this.juego.nivelActual == 1){
+        if(this.radio >= 80 && this.juego.nivelActual == 1){
             this.juego.nivelActual = 2;
-            this.juego.ponerNpcs(Gato,10);
+            this.juego.cargarNivel2();
         }
+        this.juego.textoDeDebug.text = "crecimiento: " + crecimiento;
     }
 }

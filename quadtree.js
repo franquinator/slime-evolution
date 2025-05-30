@@ -83,4 +83,50 @@ class Quadtree {
     resultado.push(...this.objetos);
     return resultado;
   }
+
+  entidadesCercanas(entidad, radio) {
+    const resultado = [];
+    
+    // Verificar si la entidad intersecta con este quadtree
+    if (!this.intersectaConCirculo(entidad.position.x, entidad.position.y, radio)) {
+      return resultado;
+    }
+
+    // Agregar objetos de este nodo que estén dentro del radio
+    for (const otraEntidad of this.objetos) {
+      if (otraEntidad !== entidad) {
+        const distanciaX = entidad.position.x - otraEntidad.position.x;
+        const distanciaY = entidad.position.y - otraEntidad.position.y;
+        const distanciaTotal = Math.sqrt(distanciaX * distanciaX + distanciaY * distanciaY);
+        
+        if (distanciaTotal < radio + otraEntidad.radio) {
+          resultado.push(otraEntidad);
+        }
+      }
+    }
+
+    // Si hay subdivisiones, revisar recursivamente las que intersecten con el círculo
+    if (this.divisiones.length > 0) {
+      for (const division of this.divisiones) {
+        const entidadesDivision = division.entidadesCercanas(entidad, radio);
+        resultado.push(...entidadesDivision);
+      }
+    }
+
+    return resultado;
+  }
+
+  intersectaConCirculo(circuloX, circuloY, radio) {
+    // Encontrar el punto más cercano del rectángulo al centro del círculo
+    const puntoMasCercanoX = Math.max(this.bounds.x, Math.min(circuloX, this.bounds.x + this.bounds.width));
+    const puntoMasCercanoY = Math.max(this.bounds.y, Math.min(circuloY, this.bounds.y + this.bounds.height));
+
+    // Calcular la distancia entre el punto más cercano y el centro del círculo
+    const distanciaX = circuloX - puntoMasCercanoX;
+    const distanciaY = circuloY - puntoMasCercanoY;
+    const distanciaCuadrada = distanciaX * distanciaX + distanciaY * distanciaY;
+
+    // Si la distancia es menor que el radio, hay intersección
+    return distanciaCuadrada <= radio * radio;
+  }
 }
