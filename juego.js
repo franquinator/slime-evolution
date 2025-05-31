@@ -5,17 +5,6 @@ class Juego {
     this.ancho = window.innerWidth;
     this.alto = window.innerHeight;
     this.tamanioBase = 3000;
-
-    //variables de quadtree
-    this.quadtree = new Quadtree({
-      x: 0,
-      y: 0,
-      width: this.ancho * 3,  // o this.fondo.width si ya está cargado
-      height: this.alto * 3
-    });
-
-    //variables de spatial hash
-    this.spatialHash = new SpatialHash(100); // Tamaño de celda de 100 pixels
     
     //variables de camara
     this.centro = {
@@ -28,310 +17,50 @@ class Juego {
     this.nivelActual = 0;
 
     //variables de juego
-    this.todasLasEntidades = [];
     this.slime = null;
     this.vidas = 3;
-    this.comidaConseguida = 0;
+    this.puntos = 0;
+    this.worldContainer = new PIXI.Container();
     
     //variables de fps
-    this.lastFpsUpdate = performance.now();
-    this.ultimoFrame = 0;
-    this.frameCount = 0;
+    this.ultimoFrame = performance.now();
     this.delta = 0;
 
-    //variables de hud
-    this.corazones = [];
-    this.contadorDeComidaTexto = null;
+    //variables de componentes
+    this.hud = new Hud(this.app);;
+    this.npcManager = new NpcManager(this);
+    this.eventos = new Eventos(this);
+    this.camara = new Camara(this);
+    this.fondo = new Fondo(this,this.tamanioBase);
 
     this.app.init({ width: this.ancho, height: this.alto }).then(() => {
       this.pixiListo();
     });
   }
 
-
   async pixiListo() {
-    console.log("pixi listo");
-
-    //agrega listeners
-    this.ponerEventListeners();
-
     //agrega elementos generales
+    await this.hud.inicializar();
+    await this.fondo.inicializar();
 
-    this.agregarHud();
-
-    this.ponerCamara();
-
-    //agrega elementos de juego
-    await this.ponerFondo();
-
-    this.ponerSlime();
-
-    this.cargarNivel1();
+    this.slime = new SlimeProta(1000, 1000, 20, this);
+    await this.slime.inicializar();
+    //this.cargarNivel1();
 
     //agrega elementos de PIXI
-
     window.__PIXI_APP__ = this.app;
-
     document.body.appendChild(this.app.canvas);
-
-    
 
     //comienza el gameloop
     this.app.ticker.add(() => this.gameLoop());
   }
-
-  //funciones de eventos
-  ponerEventListeners() {
-    window.onmousemove = (evento) => {
-      this.cuandoSeMueveElMouse(evento);
-    };
-
-    window.addEventListener('keydown', (evento) => {
-      this.cuandoSePresionaUnaTecla(evento)
-    });
-
-    window.addEventListener('wheel', (evento) => {
-      this.cuandoSeGiraLaRueda(evento);
-    }, { passive: false });
-  }
-  
-  cuandoSeMueveElMouse(evento) {
-    this.mousePos = { x: evento.x, y: evento.y };
-  }
-
-  cuandoSeGiraLaRueda(evento) {
-    this.ajustarTamanioDeCamara(evento.deltaY / 1000);
-  }
-
-  ajustarTamanioDeCamara(tamanioDeAumento) {
-    //ayudó chat gpt
-    const escalaMinima = 0.1; // Evitar que la escala sea demasiado pequeña
-    const escalaMaxima = 2;   // Evitar que la escala sea demasiado grande
-
-    // Nueva escala
-    const nuevaEscalaX = Math.max(escalaMinima, Math.min(this.worldContainer.scale.x + tamanioDeAumento, escalaMaxima));
-    const nuevaEscalaY = Math.max(escalaMinima, Math.min(this.worldContainer.scale.y + tamanioDeAumento, escalaMaxima));
-
-    // Calcular el cambio de escala
-    const factorCambioX = nuevaEscalaX / this.worldContainer.scale.x;
-    const factorCambioY = nuevaEscalaY / this.worldContainer.scale.y;
-
-    // Ajustar la posición para mantener el centro
-    const centroX = this.ancho / 2;
-    const centroY = this.alto / 2;
-
-    this.worldContainer.x = centroX - (centroX - this.worldContainer.x) * factorCambioX;
-    this.worldContainer.y = centroY - (centroY - this.worldContainer.y) * factorCambioY;
-
-    // Aplicar la nueva escala
-    this.worldContainer.scale.x = nuevaEscalaX;
-    this.worldContainer.scale.y = nuevaEscalaY;
-  }
-
-
-  cuandoSePresionaUnaTecla(evento) {
-    let key = evento.key.toLowerCase();
-    if (key === 'r' && this.vidas <= 0) {
-      reiniciarJuego();
-    }
-    if (key === 'd') {
-      if(this.panelDeDebug.visible){
-        this.panelDeDebug.visible = false;
-      }
-      else{
-        this.panelDeDebug.visible = true;
-      }
-    }
-  }
-
-  //funciones de hud
-  async agregarHud() {
-    this.hud = new PIXI.Container();
-    this.hud.zIndex = 1000;
-    this.app.stage.addChild(this.hud);
-
-    await this.dibujarCorazones();
-    this.dibujarContador();
-    this.dibujarContadorFps();
-    this.dibujarPanelDeDebug();
-  }
-
-  async dibujarCorazones() {
-    let textura = await PIXI.Assets.load("Assets/Graficos/corazon1.png");
-    for (let i = 0; i < 3; i++) {
-      const corazon = new PIXI.Sprite(textura);
-      corazon.position.set(20 + i * 30, 20);
-      this.hud.addChild(corazon);
-      this.corazones.push(corazon);
-    }
-  }
-
-  dibujarContador() {
-    this.contadorDeComidaTexto = new PIXI.Text("Comidos: 0", {
-      fill: 0xffffff,
-      fontSize: 24,
-    });
-    this.contadorDeComidaTexto.position.set(20, 50);
-    this.hud.addChild(this.contadorDeComidaTexto);
-  }
-
-  dibujarContadorFps() {
-    this.fpsText = new PIXI.Text('FPS: 0', {
-      fontFamily: 'Arial',
-      fontSize: 20,
-      fill: 0xffffff,
-    });
-    this.fpsText.anchor.set(1, 0); // anclado arriba a la derecha
-    this.fpsText.position.set(window.innerWidth - 10, 10);
-    this.hud.addChild(this.fpsText);
-  }
-
-  dibujarPanelDeDebug() {
-    this.panelDeDebug = new PIXI.Container();
-    this.panelDeDebug.zIndex = 1000;
-    this.app.stage.addChild(this.panelDeDebug);
-
-    this.textoDeDebug = new PIXI.Text("Debug", {
-      fontFamily: 'Arial',
-      fontSize: 20,
-      fill: 0xffffff,
-    });
-    this.panelDeDebug.addChild(this.textoDeDebug);
-    this.panelDeDebug.position.set(this.ancho / 2, 0);
-    this.panelDeDebug.visible = false;
-  }
-  perderVida() {
-    this.vidas--;
-    if (this.vidas >= 0) {
-      this.corazones[this.vidas].visible = false;
-    }
-    if (this.vidas === 0) {
-      alert("¡Perdiste! (Presiona 'R' para reiniciar)");
-      this.app.stop();
-    }
-  }
-
-  //funciones de camara
-  ponerCamara() {
-    this.worldContainer = new PIXI.Container({
-      // this will make moving this container GPU powered
-      isRenderGroup: true,
-    });
-    this.app.stage.addChild(this.worldContainer);
-  }
-
-  //funciones para agregar fondo
-  async ponerFondo() {
-    // Cargar la textura
-    let textura = await PIXI.Assets.load("Assets/Graficos/bg.jpg");
-
-    // Crear el TilingSprite con la textura y dimensiones
-    this.fondo = new PIXI.TilingSprite(textura, 3000, 3000);
-
-    // Añadir al escenario
-    this.worldContainer.addChild(this.fondo);
-  }
-
-  //funciones de manejo de entidades
-  ponerSlime() {
-    this.slime = new SlimeProta(1000, 1000, 20, this);
-  }
-
-  ponerNpcs(clase, cantidad) {
-    for (let i = 0; i < cantidad; i++) {
-      const npcActual = new clase(this.fondo.x + Math.random() * this.fondo.width, this.fondo.y + Math.random() * this.fondo.height, this);
-      this.todasLasEntidades.push(npcActual);
-    }
-  }
-  ponerNpcsEnPosicion(clase, cantidad, x, y,ancho,largo) {
-    for (let i = 0; i < cantidad; i++) {
-      const npcActual = new clase(x + Math.random() * ancho, y + Math.random() * largo, this);
-      this.todasLasEntidades.push(npcActual);
-    }
-  }
-  ponerNpcsAlrededorDeCuadrado(clase, cantidad, x, y,ancho,largo) {
-    let cantidadDividida = cantidad / 4;
-    /*
-     _____ _____ _____
-    |     |   s der   |
-    |s izq|_____ _____|
-    |     |     |     |
-    |_____|_____|i der|
-    |   i izq   |     |
-    |_____ _____|_____|
-    */     
-    //rectangulo superior izquierdo
-    this.ponerNpcsEnPosicion(clase, cantidadDividida, x-ancho, y-largo,ancho,largo * 2);
-    //rectangulo superior derecho
-    this.ponerNpcsEnPosicion(clase, cantidadDividida, x, y-largo,ancho * 2,largo);
-    //rectangulo inferior izquierdo
-    this.ponerNpcsEnPosicion(clase, cantidadDividida, x-ancho, y+largo,ancho * 2,largo);
-    //rectangulo inferior derecho
-    this.ponerNpcsEnPosicion(clase, cantidadDividida, x+ancho, y,ancho,largo *2);
-  }
-  agregarNpcsEnZonaNoVisible(clase, cantidad) {
-    this.ponerNpcsAlrededorDeCuadrado(clase, cantidad, this.fondo.x, this.fondo.y, this.tamanioBase, this.tamanioBase);
-  }
-  sacarNpcs(clase) {
-    console.log("npc sacados");
-    for(let i = 0; i < this.todasLasEntidades.length; i++){
-      if(this.todasLasEntidades[i] instanceof clase){
-        this.app.stage.removeChild(this.todasLasEntidades[i]);
-        this.todasLasEntidades[i].destroy();
-        this.todasLasEntidades.splice(i, 1);
-        i--;
-      }
-    }
-    console.log(this.todasLasEntidades);
-  }
-
-  //funciones para cambiar de nivel
-  cargarNivel1() {
-    this.nivelActual++;
-    this.ponerNpcs(Virus, 10);
-    this.ponerNpcs(Ameba, 5000);
-  }
-  cargarNivel2() {
-    this.nivelActual++;
-
-    this.agregarNpcsEnZonaNoVisible(Virus, 5000);
-    this.agregarNpcsEnZonaNoVisible(Gato, 20);
-    this.ampliarMapa();
-    this.sacarNpcs(Ameba);
-  }
-  cargarNivel3() {
-    this.nivelActual++;
-    this.agregarNpcsEnZonaNoVisible(Gato, 500);
-    this.ampliarMapa();
-    this.sacarNpcs(Virus);
-  }
-  ampliarMapa() {
-    this.fondo.x -= this.fondo.width;
-    this.fondo.y -= this.fondo.height;
-    this.fondo.width *= 3;
-    this.fondo.height *= 3;
-  }
-
   //funciones de gameloop
   gameLoop() {
-    this.actualizarSpatialHash();
     this.actualizarDeltaTime();
-    this.actualizarCamara();
+    this.camara.actualizar();
     this.actualizarContadorFps();
     this.actualizarProtagonista();
-    this.actualizarEntidades();
-  }
-  actualizarQuadtree() {
-    this.quadtree.limpiar();
-    for (let entidad of this.todasLasEntidades) {
-      this.quadtree.insertar(entidad);
-    }
-  }
-  actualizarSpatialHash() {
-    this.spatialHash.limpiar();
-    for (const entidad of this.todasLasEntidades) {
-      this.spatialHash.actualizarPosicion(entidad);
-    }
+    this.npcManager.update();
   }
 
   actualizarDeltaTime() {
@@ -339,47 +68,8 @@ class Juego {
     this.ultimoFrame = performance.now();
   }
 
-  actualizarCamara() {
-    const cuanto = 0.5;
-
-    // Considerar la escala actual del worldContainer
-    const escalaX = this.worldContainer.scale.x;
-    const escalaY = this.worldContainer.scale.y;
-
-    // Calcular los límites del fondo en coordenadas de mundo
-    const limiteIzquierdo = this.fondo.x;
-    const limiteDerecho = this.fondo.x + this.fondo.width;
-    const limiteSuperior = this.fondo.y;
-    const limiteInferior = this.fondo.y + this.fondo.height;
-
-    // Calcular la posición objetivo de la cámara
-    let targetX = -this.slime.position.x * escalaX + (this.ancho / 2);
-    let targetY = -this.slime.position.y * escalaY + (this.alto / 2);
-
-    // Ajustar los límites para mantener el fondo visible
-    const minX = -limiteDerecho * escalaX + this.ancho;
-    const maxX = -limiteIzquierdo * escalaX;
-    const minY = -limiteInferior * escalaY + this.alto;
-    const maxY = -limiteSuperior * escalaY;
-
-    // Aplicar los límites
-    targetX = Math.max(minX, Math.min(maxX, targetX));
-    targetY = Math.max(minY, Math.min(maxY, targetY));
-
-    // Suavizar el movimiento de la cámara con los límites aplicados
-    this.worldContainer.x -= (this.worldContainer.x - targetX) * cuanto;
-    this.worldContainer.y -= (this.worldContainer.y - targetY) * cuanto;
-  }
-
-  actualizarContadorFps(){
-    this.frameCount++;
-    const now = performance.now();
-    if (now - this.lastFpsUpdate >= 1000) {
-      const fps = this.frameCount;
-      this.fpsText.text = `FPS: ${fps}`;
-      this.lastFpsUpdate = now;
-      this.frameCount = 0;
-    }
+  actualizarContadorFps() {
+    this.hud.actualizarFPS(Math.round(this.app._ticker.FPS));
   }
 
   actualizarProtagonista() {
@@ -387,32 +77,47 @@ class Juego {
     this.slime.render();
   }
 
-  actualizarEntidades() {
-    for (let i = 0; i < this.todasLasEntidades.length; i++) {
-      this.todasLasEntidades[i].update();
-      this.todasLasEntidades[i].render();
+  agregarPuntos(puntos){
+    this.puntos += puntos;
+    this.hud.actualizarPuntos(this.puntos);
+  }
+
+  perderVida() {
+    this.vidas--;
+    this.hud.actualizarVidas(this.vidas);
+    if (this.vidas <= 0) {
+      alert("¡Perdiste! (Presiona 'R' para reiniciar)");
+      this.app.stop();
     }
   }
-  obtenerEntidadesCercanasSinOptimizar(entidad, radio) {
-    let entidadesCercanas = [];
-    for (let i = 0; i < this.todasLasEntidades.length; i++) {
-      if(this.todasLasEntidades[i] !== entidad){
-        if(distancia(this.todasLasEntidades[i].position, entidad.position) < radio){
-          entidadesCercanas.push(this.todasLasEntidades[i]);
-        }
-      }
-    }
-    return entidadesCercanas;
+  //funciones para cambiar de nivel
+  cargarNivel1() {
+    this.nivelActual++;
+    this.npcManager.ponerNpcsEnTodoElMapa(Virus, 2);
+    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 10000);
   }
-  obtenerEntidadesCercanasQuadtree(entidad, radio) {
-    return this.quadtree.entidadesCercanas(entidad, radio);
+  cargarNivel2() {
+    this.nivelActual++;
+
+    this.npcManager.agregarNpcsEnZonaNoVisible(Virus, 5000);
+    this.npcManager.agregarNpcsEnZonaNoVisible(Gato, 2);
+    this.ampliarMapa();
+    this.npcManager.sacarNpcs(Ameba);
   }
-  obtenerEntidadesCercanasSpatialHash(entidad, radio) {
-    return this.spatialHash.entidadesCercanas(entidad, radio);
+  cargarNivel3() {
+    this.nivelActual++;
+    this.npcManager.agregarNpcsEnZonaNoVisible(Gato, 500);
+    this.ampliarMapa();
+    this.npcManager.sacarNpcs(Virus);
+  }
+  ampliarMapa() {
+    this.fondo.x -= this.fondo.width;
+    this.fondo.y -= this.fondo.height;
+    this.fondo.width *= 3;
+    this.fondo.height *= 3;
   }
 }
 
 window.reiniciarJuego = function () {
   location.reload(); // recarga la página para reiniciar todo
 };
-

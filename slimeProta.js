@@ -5,8 +5,9 @@ class SlimeProta extends Entidad{
 
         this.scaleOffset = 8;
         this.animacionActual = null;
-       
-        this.cargarAnimacion();
+    }
+    async inicializar(){
+        await this.cargarAnimacion();
     }
 
     async cargarAnimacion() {
@@ -29,10 +30,11 @@ class SlimeProta extends Entidad{
     }
 
     update(){
+        //console.log(this.position);
         if(this.tiempoDesdeUltimoDaño > 0){
             this.tiempoDesdeUltimoDaño -= this.juego.delta;
         }
-         console.log(this.posicionEnPantalla(),this.juego.mousePos);
+        //console.log(this.posicionEnPantalla(),this.juego.mousePos);
         this.asignarFuerzaQueMeLlevaAlMouse();
         this.verificarColisiones();
         super.update();
@@ -81,18 +83,23 @@ class SlimeProta extends Entidad{
     }
 
     asignarFuerzaQueMeLlevaAlMouse(){
-        //console.log(distancia(this.posicionEnPantalla(),this.juego.mousePos));
         this.asignarAceleracion(0,0);
-        if(this.juego.mousePos === undefined || distancia(this.posicionEnPantalla(),this.juego.mousePos) < 50) return;
+        if(!this.juego.mouse || distancia(this.posicionEnPantalla(),this.juego.mouse) < 50) return;
 
         const fuerza = getUnitVector(
-            this.juego.mousePos,
+            this.juego.mouse,
             this.posicionEnPantalla()
         );
+        console.log("mouse: "+this.juego.mouse.x);
+        console.log("posicion: "+this.posicionEnPantalla().x);
+        if(this.sprite == null) return console.error("sprite null");
+        ;
 
         this.asignarAceleracionNormalizada(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
     }
     posicionEnPantalla(){
+        console.log("posicion jugador: " + this.position.x);
+        console.log("juego: " + this.juego.worldContainer.x);
         const posicion = this.juego.worldContainer.toGlobal(this.position);
         return {
             x: posicion.x, //* escalaX,
@@ -103,18 +110,16 @@ class SlimeProta extends Entidad{
     verificarColisiones(){
         //const colisiones = this.juego.obtenerEntidadesCercanasSinOptimizar(this,this.radio);
         //const colisiones = this.juego.obtenerEntidadesCercanasQuadtree(this,this.radio);
-        const colisiones = this.juego.obtenerEntidadesCercanasSpatialHash(this, this.radio);
+        const colisiones = this.juego.npcManager.obtenerEntidadesCercanasSpatialHash(this, this.radio);
         //const posiblesColisiones = this.juego.quadtree.recuperar(this);
 
         for (let i = 0; i < colisiones.length; i++) {
             const npcActual = colisiones[i];
             if(npcActual.radio <= this.radio){
                 this.comer(npcActual);
-                const index = this.juego.todasLasEntidades.indexOf(npcActual);
-                if (index > -1) this.juego.todasLasEntidades.splice(index, 1);
-                if(this.juego.todasLasEntidades.length == 0){
+/*                 if(this.juego.todasLasEntidades.length == 0){
                     alert("Ganaste (Presiona 'F5' para reiniciar)");
-                }
+                } */
             }
             else if(npcActual.radio > this.radio && this.tiempoDesdeUltimoDaño <= 0){
                 this.juego.perderVida();
@@ -135,15 +140,14 @@ class SlimeProta extends Entidad{
         this.radio += crecimiento;
         this.sprite.setSize(this.radio * this.scaleOffset);
 
-        this.juego.comidaConseguida += 1;
-        this.juego.contadorDeComidaTexto.text =  "Puntaje: " + this.juego.comidaConseguida;
+        this.juego.agregarPuntos(1);
 
-        this.juego.app.stage.removeChild(comida);
-        comida.destroy();
+        this.juego.npcManager.eliminarEntidad(comida);
+
         if(this.radio >= 80 && this.juego.nivelActual == 1){
             this.juego.nivelActual = 2;
             this.juego.cargarNivel2();
         }
-        this.juego.textoDeDebug.text = "crecimiento: " + crecimiento;
+        this.juego.hud.actualizarDebug("crecimiento: " + crecimiento);
     }
 }

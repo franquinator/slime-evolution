@@ -46,22 +46,34 @@ class Entidad{
     }
     
     asignarVelocidad(x,y){
+        if (isNaN(x) || isNaN(y)) {
+            throw new Error("Velocidad NaN detectada");
+        }
         this.vel.x = x;
         this.vel.y = y;
     }
 
     asignarAceleracion(x,y){
+        if (isNaN(x) || isNaN(y)) {
+            throw new Error("Aceleración NaN detectada");
+        }
         this.aceleracion.x = x;
         this.aceleracion.y = y;
     }
 
     asignarAceleracionNormalizada(x,y){
+        if (isNaN(x) || isNaN(y)) {
+            throw new Error("Aceleración NaN detectada");
+        }
         const aceleracionNormalizada = normalizar(x,y);
         this.aceleracion.x = x;
         this.aceleracion.y = y;
     }
 
     asignarVelocidadNormalizada(x,y){
+        if (isNaN(x) || isNaN(y)) {
+            throw new Error("Velocidad NaN detectada");
+        }
         const velocidadNormalizada = normalizar(x,y);
         this.vel.x = velocidadNormalizada.x;
         this.vel.y = velocidadNormalizada.y;
@@ -76,10 +88,19 @@ class Entidad{
     aplicarVelocidad() {
         const delta = this.juego.delta;
         const posicionDeFondo = this.juego.fondo.position;
-        const tamañoJuego = this.juego.fondo;
-    
+        const tamañoJuego = this.juego.fondo.tamanio;
+
+
+        //console.log("pos: "+this.position," vel",this.vel," delta",delta," posicionDeFondo",posicionDeFondo," tamañoJuego",tamañoJuego);
         this.position.x = clamp(this.position.x + this.vel.x * delta, posicionDeFondo.x, posicionDeFondo.x + tamañoJuego.width);
         this.position.y = clamp(this.position.y + this.vel.y * delta, posicionDeFondo.y, posicionDeFondo.y + tamañoJuego.height);
+/* 
+        if(this.position.x == undefined){
+            debugger;
+        }
+        if(!this.position.y){
+            debugger;
+        } */
     }
     irA(x,y){
         this.position.x = x;
