@@ -32,7 +32,7 @@ class SlimeProta extends Entidad{
         if(this.tiempoDesdeUltimoDaño > 0){
             this.tiempoDesdeUltimoDaño -= this.juego.delta;
         }
-         
+         console.log(this.posicionEnPantalla(),this.juego.mousePos);
         this.asignarFuerzaQueMeLlevaAlMouse();
         this.verificarColisiones();
         super.update();
@@ -81,15 +81,23 @@ class SlimeProta extends Entidad{
     }
 
     asignarFuerzaQueMeLlevaAlMouse(){
+        //console.log(distancia(this.posicionEnPantalla(),this.juego.mousePos));
         this.asignarAceleracion(0,0);
-        if(this.juego.mousePos === undefined || distancia(this.juego.centro,this.juego.mousePos) < 50) return;
+        if(this.juego.mousePos === undefined || distancia(this.posicionEnPantalla(),this.juego.mousePos) < 50) return;
 
         const fuerza = getUnitVector(
             this.juego.mousePos,
-            this.juego.centro
+            this.posicionEnPantalla()
         );
 
         this.asignarAceleracionNormalizada(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
+    }
+    posicionEnPantalla(){
+        const posicion = this.juego.worldContainer.toGlobal(this.position);
+        return {
+            x: posicion.x, //* escalaX,
+            y: posicion.y //* escalaY
+        };
     }
 
     verificarColisiones(){

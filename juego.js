@@ -289,7 +289,7 @@ class Juego {
   cargarNivel1() {
     this.nivelActual++;
     this.ponerNpcs(Virus, 10);
-    this.ponerNpcs(Ameba, 10000);
+    this.ponerNpcs(Ameba, 1000);
   }
   cargarNivel2() {
     this.nivelActual++;
@@ -340,20 +340,35 @@ class Juego {
   }
 
   actualizarCamara() {
-    //ayudó chat gpt
     const cuanto = 0.5;
 
     // Considerar la escala actual del worldContainer
     const escalaX = this.worldContainer.scale.x;
     const escalaY = this.worldContainer.scale.y;
 
-    // Ajustar los valores finales en función de la escala
-    const valorFinalX = (-this.slime.position.x * escalaX) + (this.ancho / 2);
-    const valorFinalY = (-this.slime.position.y * escalaY) + (this.alto / 2);
+    // Calcular los límites del fondo en coordenadas de mundo
+    const limiteIzquierdo = this.fondo.x;
+    const limiteDerecho = this.fondo.x + this.fondo.width;
+    const limiteSuperior = this.fondo.y;
+    const limiteInferior = this.fondo.y + this.fondo.height;
 
-    // Suavizar el movimiento de la cámara
-    this.worldContainer.x -= (this.worldContainer.x - valorFinalX) * cuanto;
-    this.worldContainer.y -= (this.worldContainer.y - valorFinalY) * cuanto;
+    // Calcular la posición objetivo de la cámara
+    let targetX = -this.slime.position.x * escalaX + (this.ancho / 2);
+    let targetY = -this.slime.position.y * escalaY + (this.alto / 2);
+
+    // Ajustar los límites para mantener el fondo visible
+    const minX = -limiteDerecho * escalaX + this.ancho;
+    const maxX = -limiteIzquierdo * escalaX;
+    const minY = -limiteInferior * escalaY + this.alto;
+    const maxY = -limiteSuperior * escalaY;
+
+    // Aplicar los límites
+    targetX = Math.max(minX, Math.min(maxX, targetX));
+    targetY = Math.max(minY, Math.min(maxY, targetY));
+
+    // Suavizar el movimiento de la cámara con los límites aplicados
+    this.worldContainer.x -= (this.worldContainer.x - targetX) * cuanto;
+    this.worldContainer.y -= (this.worldContainer.y - targetY) * cuanto;
   }
 
   actualizarContadorFps(){
