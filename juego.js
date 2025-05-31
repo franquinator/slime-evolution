@@ -289,12 +289,12 @@ class Juego {
   cargarNivel1() {
     this.nivelActual++;
     this.ponerNpcs(Virus, 10);
-    this.ponerNpcs(Ameba, 1000);
+    this.ponerNpcs(Ameba, 5000);
   }
   cargarNivel2() {
     this.nivelActual++;
 
-    this.agregarNpcsEnZonaNoVisible(Virus, 500);
+    this.agregarNpcsEnZonaNoVisible(Virus, 5000);
     this.agregarNpcsEnZonaNoVisible(Gato, 20);
     this.ampliarMapa();
     this.sacarNpcs(Ameba);
