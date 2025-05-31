@@ -24,8 +24,8 @@ class Npc extends Entidad{
     }
     deambular(){
         if(this.puntoDeDestino === undefined || distancia(this.puntoDeDestino,this.position) < 10 ){
-            this.puntoDeDestino = {x:Math.random() * this.juego.fondo.width,
-                                   y:Math.random() * this.juego.fondo.height};
+            this.puntoDeDestino = {x:this.juego.fondo.x +(Math.random() * this.juego.fondo.width) ,
+                                   y:this.juego.fondo.y +(Math.random() * this.juego.fondo.height) };
         }
         const direccion = getUnitVector(this.puntoDeDestino,this.position);
         this.asignarAceleracionNormalizada(direccion.x * this.MultiplicadorDeAceleracion,
@@ -33,7 +33,7 @@ class Npc extends Entidad{
     }
     estaA_DistaciaDe_(distacia,objetivo){
         if(objetivo === undefined) return false;
-        return distancia(this.position,objetivo.position) < distacia;
+        return distancia(this.position,objetivo.position)-objetivo.radio-this.radio < distacia;
     }
 
 }

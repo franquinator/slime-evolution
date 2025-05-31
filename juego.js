@@ -4,6 +4,7 @@ class Juego {
     this.app = new PIXI.Application();
     this.ancho = window.innerWidth;
     this.alto = window.innerHeight;
+    this.tamanioBase = 3000;
 
     //variables de quadtree
     this.quadtree = new Quadtree({
@@ -225,7 +226,7 @@ class Juego {
     let textura = await PIXI.Assets.load("Assets/Graficos/bg.jpg");
 
     // Crear el TilingSprite con la textura y dimensiones
-    this.fondo = new PIXI.TilingSprite(textura, this.ancho * 3, this.alto * 3);
+    this.fondo = new PIXI.TilingSprite(textura, 3000, 3000);
 
     // Añadir al escenario
     this.worldContainer.addChild(this.fondo);
@@ -238,9 +239,38 @@ class Juego {
 
   ponerNpcs(clase, cantidad) {
     for (let i = 0; i < cantidad; i++) {
-      const npcActual = new clase(Math.random() * this.fondo.width, Math.random() * this.fondo.height, this);
+      const npcActual = new clase(this.fondo.x + Math.random() * this.fondo.width, this.fondo.y + Math.random() * this.fondo.height, this);
       this.todasLasEntidades.push(npcActual);
     }
+  }
+  ponerNpcsEnPosicion(clase, cantidad, x, y,ancho,largo) {
+    for (let i = 0; i < cantidad; i++) {
+      const npcActual = new clase(x + Math.random() * ancho, y + Math.random() * largo, this);
+      this.todasLasEntidades.push(npcActual);
+    }
+  }
+  ponerNpcsAlrededorDeCuadrado(clase, cantidad, x, y,ancho,largo) {
+    let cantidadDividida = cantidad / 4;
+    /*
+     _____ _____ _____
+    |     |   s der   |
+    |s izq|_____ _____|
+    |     |     |     |
+    |_____|_____|i der|
+    |   i izq   |     |
+    |_____ _____|_____|
+    */     
+    //rectangulo superior izquierdo
+    this.ponerNpcsEnPosicion(clase, cantidadDividida, x-ancho, y-largo,ancho,largo * 2);
+    //rectangulo superior derecho
+    this.ponerNpcsEnPosicion(clase, cantidadDividida, x, y-largo,ancho * 2,largo);
+    //rectangulo inferior izquierdo
+    this.ponerNpcsEnPosicion(clase, cantidadDividida, x-ancho, y+largo,ancho * 2,largo);
+    //rectangulo inferior derecho
+    this.ponerNpcsEnPosicion(clase, cantidadDividida, x+ancho, y,ancho,largo *2);
+  }
+  agregarNpcsEnZonaNoVisible(clase, cantidad) {
+    this.ponerNpcsAlrededorDeCuadrado(clase, cantidad, this.fondo.x, this.fondo.y, this.tamanioBase, this.tamanioBase);
   }
   sacarNpcs(clase) {
     console.log("npc sacados");
@@ -263,9 +293,23 @@ class Juego {
   }
   cargarNivel2() {
     this.nivelActual++;
+
+    this.agregarNpcsEnZonaNoVisible(Virus, 500);
+    this.agregarNpcsEnZonaNoVisible(Gato, 20);
+    this.ampliarMapa();
     this.sacarNpcs(Ameba);
-    this.ponerNpcs(Gato, 10);
-    this.ponerNpcs(Virus, 2000);
+  }
+  cargarNivel3() {
+    this.nivelActual++;
+    this.agregarNpcsEnZonaNoVisible(Gato, 500);
+    this.ampliarMapa();
+    this.sacarNpcs(Virus);
+  }
+  ampliarMapa() {
+    this.fondo.x -= this.fondo.width;
+    this.fondo.y -= this.fondo.height;
+    this.fondo.width *= 3;
+    this.fondo.height *= 3;
   }
 
   //funciones de gameloop

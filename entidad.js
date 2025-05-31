@@ -75,10 +75,11 @@ class Entidad{
     }
     aplicarVelocidad() {
         const delta = this.juego.delta;
+        const posicionDeFondo = this.juego.fondo.position;
         const tamañoJuego = this.juego.fondo;
     
-        this.position.x = clamp(this.position.x + this.vel.x * delta, 0, tamañoJuego.width);
-        this.position.y = clamp(this.position.y + this.vel.y * delta, 0, tamañoJuego.height);
+        this.position.x = clamp(this.position.x + this.vel.x * delta, posicionDeFondo.x, posicionDeFondo.x + tamañoJuego.width);
+        this.position.y = clamp(this.position.y + this.vel.y * delta, posicionDeFondo.y, posicionDeFondo.y + tamañoJuego.height);
     }
     irA(x,y){
         this.position.x = x;
