@@ -95,6 +95,13 @@ class Juego {
       this.app.stop();
     }
   }
+
+  cargarNivel(nivel){
+    this.nivelActual = nivel;
+    this.npcManager.ponerNpcsEnTodoElMapa(Virus, 2);
+    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 1000);
+    this.ampliarMapa();
+  }
   //funciones para cambiar de nivel
   cargarNivel1() {
     this.nivelActual++;

@@ -3,7 +3,6 @@
         {
             "nivel": 1,
             "descripcion": "Nivel 1",
-            "npcManager": "npcManager.js",
             "npcs": [
                 {
                     "clase": "Virus",
@@ -11,7 +10,7 @@
                 },
                 {
                     "clase": "Ameba",
-                    "cantidad": 5000
+                    "cantidad": 1000
                 }
             ],
             "npcsABorrar": [
@@ -20,11 +19,10 @@
         {
             "nivel": 2,
             "descripcion": "Nivel 2",
-            "npcManager": "npcManager.js",
             "npcs": [
                 {
                     "clase": "Virus",
-                    "cantidad": 10000
+                    "cantidad": 1000
                 },
                 {
                     "clase": "Gato",

@@ -34,10 +34,10 @@ class Camara {
 
         // Calcular los límites de la cámara
         const limitesCamara = {
-            minX: -(limites.derecho * escalaX - this.juego.app.screen.width),
-            maxX: 0,
-            minY: -(limites.inferior * escalaY - this.juego.app.screen.height),
-            maxY: 0
+            minX: -limites.derecho * escalaX + this.juego.app.screen.width,
+            maxX: -limites.izquierdo * escalaX,
+            minY: -limites.inferior * escalaY + this.juego.app.screen.height,
+            maxY: -limites.superior * escalaY
         };
 
         // Aplicar los límites con una función de clamp
