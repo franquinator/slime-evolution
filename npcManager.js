@@ -32,7 +32,7 @@ class NpcManager{
       console.log(this.todasLasEntidades);
     }
     ponerNpcsEnTodoElMapa(clase, cantidad) {
-      this.ponerNpcsEnZona(clase, cantidad, this.juego.fondo.x, this.juego.fondo.y, this.juego.fondo.width, this.juego.fondo.height);
+      this.ponerNpcsEnZona(clase, cantidad, this.juego.fondo.position.x, this.juego.fondo.position.y, this.juego.fondo.width, this.juego.fondo.height);
     }
     ponerNpcsEnZona(clase, cantidad, x, y,ancho,largo) {
       for (let i = 0; i < cantidad; i++) {
@@ -61,7 +61,7 @@ class NpcManager{
       this.ponerNpcsEnZona(clase, cantidadDividida, x+ancho, y,ancho,largo *2);
     }
     agregarNpcsEnZonaNoVisible(clase, cantidad) {
-      this.ponerNpcsAlrededorDeCuadrado(clase, cantidad, this.juego.fondo.x, this.juego.fondo.y, this.juego.fondo.width, this.juego.fondo.height);
+      this.ponerNpcsAlrededorDeCuadrado(clase, cantidad, this.juego.fondo.position.x, this.juego.fondo.position.y, this.juego.fondo.width, this.juego.fondo.height);
     }
     obtenerEntidadesCercanasSinOptimizar(entidad, radio) {
       let entidadesCercanas = [];

@@ -20,7 +20,10 @@ class Juego {
     this.slime = null;
     this.vidas = 3;
     this.puntos = 0;
-    this.worldContainer = new PIXI.Container();
+    this.worldContainer = new PIXI.Container({
+      // this will make moving this container GPU powered
+      isRenderGroup: true,
+    });
     
     //variables de fps
     this.ultimoFrame = performance.now();
@@ -40,12 +43,14 @@ class Juego {
 
   async pixiListo() {
     //agrega elementos generales
+    this.camara.inicializar();
     await this.hud.inicializar();
     await this.fondo.inicializar();
 
-    this.slime = new SlimeProta(1000, 1000, 20, this);
+
+    this.slime = new SlimeProta(1500, 1500, 20, this);
     await this.slime.inicializar();
-    //this.cargarNivel1();
+    this.cargarNivel1();
 
     //agrega elementos de PIXI
     window.__PIXI_APP__ = this.app;
@@ -94,12 +99,12 @@ class Juego {
   cargarNivel1() {
     this.nivelActual++;
     this.npcManager.ponerNpcsEnTodoElMapa(Virus, 2);
-    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 10000);
+    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 1000);
   }
   cargarNivel2() {
     this.nivelActual++;
 
-    this.npcManager.agregarNpcsEnZonaNoVisible(Virus, 5000);
+    this.npcManager.agregarNpcsEnZonaNoVisible(Virus, 1000);
     this.npcManager.agregarNpcsEnZonaNoVisible(Gato, 2);
     this.ampliarMapa();
     this.npcManager.sacarNpcs(Ameba);
@@ -111,10 +116,7 @@ class Juego {
     this.npcManager.sacarNpcs(Virus);
   }
   ampliarMapa() {
-    this.fondo.x -= this.fondo.width;
-    this.fondo.y -= this.fondo.height;
-    this.fondo.width *= 3;
-    this.fondo.height *= 3;
+    this.fondo.ampliar(3);
   }
 }
 

@@ -1,5 +1,10 @@
 class Entidad{
     constructor(posX,posY,radio,juego){
+        verificarValor(posX,"posX");
+        verificarValor(posY,"posY");
+        verificarValor(radio,"radio");
+        verificarValor(juego,"juego");
+
         this.position = {x:posX, y:posY};
 
         this.radio = radio; 
@@ -13,7 +18,6 @@ class Entidad{
         this.friccion = 0.90;
 
         this.container = new PIXI.Container();
-
     }
     async MostrarCollider(){
         const collider = new PIXI.Graphics()
@@ -88,7 +92,7 @@ class Entidad{
     aplicarVelocidad() {
         const delta = this.juego.delta;
         const posicionDeFondo = this.juego.fondo.position;
-        const tamañoJuego = this.juego.fondo.tamanio;
+        const tamañoJuego = this.juego.fondo;
 
 
         //console.log("pos: "+this.position," vel",this.vel," delta",delta," posicionDeFondo",posicionDeFondo," tamañoJuego",tamañoJuego);

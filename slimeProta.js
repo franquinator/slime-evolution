@@ -90,16 +90,16 @@ class SlimeProta extends Entidad{
             this.juego.mouse,
             this.posicionEnPantalla()
         );
-        console.log("mouse: "+this.juego.mouse.x);
-        console.log("posicion: "+this.posicionEnPantalla().x);
+        //console.log("mouse: "+this.juego.mouse.x);
+        //console.log("posicion: "+this.posicionEnPantalla().x);
         if(this.sprite == null) return console.error("sprite null");
         ;
 
         this.asignarAceleracionNormalizada(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
     }
     posicionEnPantalla(){
-        console.log("posicion jugador: " + this.position.x);
-        console.log("juego: " + this.juego.worldContainer.x);
+        //console.log("posicion jugador: " + this.position.x);
+        //console.log("juego: " + this.juego.worldContainer.x);
         const posicion = this.juego.worldContainer.toGlobal(this.position);
         return {
             x: posicion.x, //* escalaX,
@@ -137,7 +137,7 @@ class SlimeProta extends Entidad{
         this.radio = Math.sqrt((area + area2) / Math.PI); */
         let crecimiento = comida.radio / this.radio;
 
-        this.radio += crecimiento;
+        this.radio += crecimiento * 10;
         this.sprite.setSize(this.radio * this.scaleOffset);
 
         this.juego.agregarPuntos(1);

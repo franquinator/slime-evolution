@@ -1,52 +1,68 @@
 class Camara {
     constructor(juego) {
         this.juego = juego;
-        this.juego.worldContainer = new PIXI.Container({
-            // this will make moving this container GPU powered
-            isRenderGroup: true,
-        });
-        this.juego.app.stage.addChild(this.juego.worldContainer);
         
         // Inicializar la escala del contenedor
-        this.juego.worldContainer.scale.set(1, 1);
+        //this.juego.worldContainer.scale.set(1, 1);
+    }
+    inicializar() {
+        this.juego.app.stage.addChild(this.juego.worldContainer);
     }
 
     actualizar() {
-        const worldContainer = this.juego.worldContainer;
-        const slime = this.juego.slime;
-        const fondo = this.juego.fondo;
-        
-        if (!slime || !fondo) return;
+        const { worldContainer, slime, fondo } = this.juego;
 
-        const cuanto = 0.5; // Factor de suavizado más suave
+        if (!slime || !fondo) {
+            console.warn('No se puede actualizar la cámara: slime o fondo no están definidos');
+            return;
+        }
 
-        // Considerar la escala actual del worldContainer
-        const escalaX = worldContainer.scale.x;
-        const escalaY = worldContainer.scale.y;
-    
-        // Calcular los límites del fondo en coordenadas de mundo
-        const limiteIzquierdo = fondo.x;
-        const limiteDerecho = fondo.x + fondo.width;
-        const limiteSuperior = fondo.y;
-        const limiteInferior = fondo.y + fondo.height;
-    
+        // Obtener las escalas actuales
+        const { x: escalaX, y: escalaY } = worldContainer.scale;
+
+        // Calcular los límites del mundo
+        const limites = {
+            izquierdo: fondo.position.x,
+            derecho: fondo.position.x + fondo.width,
+            superior: fondo.position.y,
+            inferior: fondo.position.y + fondo.height
+        };
+
         // Calcular la posición objetivo de la cámara
-        let targetX = -slime.position.x * escalaX + (this.juego.ancho / 2);
-        let targetY = -slime.position.y * escalaY + (this.juego.alto / 2);
-    
-        // Ajustar los límites para mantener el fondo visible
-        const minX = -limiteDerecho * escalaX + this.juego.ancho;
-        const maxX = -limiteIzquierdo * escalaX;
-        const minY = -limiteInferior * escalaY + this.juego.alto;
-        const maxY = -limiteSuperior * escalaY;
-    
-        // Aplicar los límites
-        targetX = Math.max(minX, Math.min(maxX, targetX));
-        targetY = Math.max(minY, Math.min(maxY, targetY));
-    
-        // Suavizar el movimiento de la cámara con los límites aplicados
-        worldContainer.x += (targetX - worldContainer.x) * cuanto;
-        worldContainer.y += (targetY - worldContainer.y) * cuanto;
+        let targetX = -slime.position.x * escalaX + (this.juego.app.screen.width / 2);
+        let targetY = -slime.position.y * escalaY + (this.juego.app.screen.height / 2);
+
+        // Calcular los límites de la cámara
+        const limitesCamara = {
+            minX: -(limites.derecho * escalaX - this.juego.app.screen.width),
+            maxX: 0,
+            minY: -(limites.inferior * escalaY - this.juego.app.screen.height),
+            maxY: 0
+        };
+
+        // Aplicar los límites con una función de clamp
+        targetX = Math.max(limitesCamara.minX, Math.min(limitesCamara.maxX, targetX));
+        targetY = Math.max(limitesCamara.minY, Math.min(limitesCamara.maxY, targetY));
+
+        // Aplicar suavizado al movimiento
+        const factorSuavizado = 0.1;
+        const deltaX = targetX - worldContainer.x;
+        const deltaY = targetY - worldContainer.y;
+
+        worldContainer.x += deltaX * factorSuavizado;
+        worldContainer.y += deltaY * factorSuavizado;
+
+        // Validación de valores numéricos
+        if (isNaN(worldContainer.x) || isNaN(worldContainer.y)) {
+            console.error('Error en la actualización de la cámara:', {
+                posicionActual: { x: worldContainer.x, y: worldContainer.y },
+                posicionObjetivo: { x: targetX, y: targetY },
+                escalas: { x: escalaX, y: escalaY }
+            });
+            // Restablecer a una posición segura
+            worldContainer.x = worldContainer.x || 0;
+            worldContainer.y = worldContainer.y || 0;
+        }
     }
 
     ajustarTamanio(tamanioDeAumento) {

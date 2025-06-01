@@ -69,3 +69,9 @@ function normalizar(x,y){
 function clamp(valor, min, max) {
   return Math.max(min, Math.min(max, valor));
 }
+function verificarValor(valor,nombre){
+  if(!valor){
+    console.error(nombre+" es invalida");
+  }
+}
+

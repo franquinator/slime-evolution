@@ -1,7 +1,8 @@
 class Fondo {
     constructor(juego,tamanio){
         this.juego = juego;
-        this.tamanio = {width: tamanio, height: tamanio};
+        this.width = tamanio;
+        this.height = tamanio;
         this.position = {x: 0, y: 0};
     }
     async inicializar() {
@@ -9,9 +10,21 @@ class Fondo {
         let textura = await PIXI.Assets.load("Assets/Graficos/bg.jpg");
     
         // Crear el TilingSprite con la textura y dimensiones
-        this.fondo = new PIXI.TilingSprite(textura, 3000, 3000);
+        this.sprite = new PIXI.TilingSprite(textura, this.width, this.height);
     
         // Añadir al escenario
-        this.juego.worldContainer.addChild(this.fondo);
+        this.juego.worldContainer.addChild(this.sprite);
+    }
+    ampliar(tamanio){
+        this.width *= tamanio;
+        this.height *= tamanio;
+        this.sprite.width *= tamanio;
+        this.sprite.height *= tamanio;
+    }
+    mover(x,y){
+        this.position.x = x;
+        this.position.y = y;
+        this.sprite.x = x;
+        this.sprite.y = y;
     }
 }

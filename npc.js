@@ -24,9 +24,11 @@ class Npc extends Entidad{
     }
     deambular(){
         if(this.puntoDeDestino === undefined || distancia(this.puntoDeDestino,this.position) < 10 ){
-            this.puntoDeDestino = {x:this.juego.fondo.x +(Math.random() * this.juego.fondo.width) ,
-                                   y:this.juego.fondo.y +(Math.random() * this.juego.fondo.height) };
+            this.puntoDeDestino = {x:this.juego.fondo.position.x +(Math.random() * this.juego.fondo.width) ,
+                                   y:this.juego.fondo.position.y +(Math.random() * this.juego.fondo.height) };
         }
+        //console.log(this.puntoDeDestino);
+        //console.log(this.position);
         const direccion = getUnitVector(this.puntoDeDestino,this.position);
         this.asignarAceleracionNormalizada(direccion.x * this.MultiplicadorDeAceleracion,
                                            direccion.y * this.MultiplicadorDeAceleracion);
