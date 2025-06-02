@@ -30,11 +30,11 @@ class Entidad{
         collider.name = "collider";
         this.container.addChild(collider);
     }
-    async cargarSprite(ruta,subspriteOffset){
+    async cargarSprite(ruta,escalaExtra){
         let textura = await PIXI.Assets.load(ruta);
 
         this.sprite = new PIXI.Sprite(textura);
-        this.sprite.setSize(this.radio * 2 + subspriteOffset);
+        this.sprite.setSize(this.radio * 2 + escalaExtra);
         this.sprite.anchor.set(0.5,0.5);
 
         this.container.addChild(this.sprite);

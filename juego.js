@@ -14,7 +14,10 @@ class Juego {
     this.mouse = { x: 0, y: 0 };
 
     //variables de cambio de nivel
-    this.nivelActual = 0;
+    this.finalizado = false;
+    this.nivelActual = 1;
+    this.radioNivel = [150,1300,2400];
+    this.radioNivelActual = this.radioNivel[this.nivelActual-1];
 
     //variables de juego
     this.slime = null;
@@ -88,37 +91,49 @@ class Juego {
   }
 
   perderVida() {
-    this.vidas--;
+/*     this.vidas--;
     this.hud.actualizarVidas(this.vidas);
     if (this.vidas <= 0) {
       alert("¡Perdiste! (Presiona 'R' para reiniciar)");
+      this.finalizado = true;
+      this.app.stop();
+    } */
+  }
+  subirNivel(){
+    this.nivelActual++;
+    console.log("subiendo nivel"+this.nivelActual);
+    if(this.nivelActual == 2){
+      this.cargarNivel2();
+    }
+    else if(this.nivelActual == 3){
+      this.cargarNivel3();
+    }
+    else if(this.nivelActual >= 4){
+      alert("¡Ganaste! (Presiona 'R' para reiniciar)");
+      this.finalizado = true;
       this.app.stop();
     }
+    this.radioNivelActual = this.radioNivel[this.nivelActual-1];
+
   }
 
-  cargarNivel(nivel){
-    this.nivelActual = nivel;
-    this.npcManager.ponerNpcsEnTodoElMapa(Virus, 2);
-    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 1000);
-    this.ampliarMapa();
-  }
   //funciones para cambiar de nivel
   cargarNivel1() {
-    this.nivelActual++;
-    this.npcManager.ponerNpcsEnTodoElMapa(Virus, 2);
+    console.log("cargando nivel 1");
+    this.npcManager.ponerNpcsEnTodoElMapa(Virus, 20);
     this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 1000);
   }
   cargarNivel2() {
-    this.nivelActual++;
-
+    console.log("cargando nivel 2");
+    this.npcManager.agregarNpcsEnZonaNoVisible(Larva, 20);
     this.npcManager.agregarNpcsEnZonaNoVisible(Virus, 1000);
-    this.npcManager.agregarNpcsEnZonaNoVisible(Gato, 2);
     this.ampliarMapa();
     this.npcManager.sacarNpcs(Ameba);
   }
   cargarNivel3() {
-    this.nivelActual++;
-    this.npcManager.agregarNpcsEnZonaNoVisible(Gato, 500);
+    console.log("cargando nivel 3");
+    this.npcManager.agregarNpcsEnZonaNoVisible(Pez, 2);
+    this.npcManager.agregarNpcsEnZonaNoVisible(Larva, 500);
     this.ampliarMapa();
     this.npcManager.sacarNpcs(Virus);
   }

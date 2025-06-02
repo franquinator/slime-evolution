@@ -27,7 +27,7 @@ class Eventos{
 
     cuandoSePresionaUnaTecla(evento) {
         let key = evento.key.toLowerCase();
-        if (key === 'r' && this.juego.vidas <= 0) {
+        if (key === 'r' && this.juego.finalizado) {
             reiniciarJuego();
         }
         if (key === 'd') {

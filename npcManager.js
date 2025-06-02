@@ -9,13 +9,13 @@ class NpcManager{
       });
   
       //variables de spatial hash
-      this.spatialHash = new SpatialHash(100); // Tamaño de celda de 100 pixels
+      //this.spatialHash = new SpatialHash(100); // Tamaño de celda de 100 pixels
   
       this.juego = juego;
       this.todasLasEntidades = [];
     }
     update(){
-      this.actualizarSpatialHash();
+      //this.actualizarSpatialHash();
       for(let i = 0; i < this.todasLasEntidades.length; i++){
         this.todasLasEntidades[i].update();
         this.todasLasEntidades[i].render();
@@ -30,6 +30,14 @@ class NpcManager{
         }
       }
       console.log(this.todasLasEntidades);
+    }
+    sacarNpcsNoVisibles(clase){
+      for(let i = 0; i < this.todasLasEntidades.length; i++){
+        if(this.todasLasEntidades[i] instanceof clase && this.todasLasEntidades[i].visible == false){
+          this.eliminarEntidadEn(i);
+          i--;
+        }
+      }
     }
     ponerNpcsEnTodoElMapa(clase, cantidad) {
       this.ponerNpcsEnZona(clase, cantidad, this.juego.fondo.position.x, this.juego.fondo.position.y, this.juego.fondo.width, this.juego.fondo.height);

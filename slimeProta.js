@@ -5,6 +5,7 @@ class SlimeProta extends Entidad{
 
         this.scaleOffset = 8;
         this.animacionActual = null;
+        this.MostrarCollider();
     }
     async inicializar(){
         await this.cargarAnimacion();
@@ -110,7 +111,7 @@ class SlimeProta extends Entidad{
     verificarColisiones(){
         //const colisiones = this.juego.obtenerEntidadesCercanasSinOptimizar(this,this.radio);
         //const colisiones = this.juego.obtenerEntidadesCercanasQuadtree(this,this.radio);
-        const colisiones = this.juego.npcManager.obtenerEntidadesCercanasSpatialHash(this, this.radio);
+        const colisiones = this.juego.npcManager.obtenerEntidadesCercanasSinOptimizar(this, this.radio);
         //const posiblesColisiones = this.juego.quadtree.recuperar(this);
 
         for (let i = 0; i < colisiones.length; i++) {
@@ -144,9 +145,9 @@ class SlimeProta extends Entidad{
 
         this.juego.npcManager.eliminarEntidad(comida);
 
-        if(this.radio >= 80 && this.juego.nivelActual == 1){
-            this.juego.nivelActual = 2;
-            this.juego.cargarNivel2();
+        if(this.radio >= this.juego.radioNivelActual){
+            console.log("radio: "+this.radio+" radioNivelActual: "+this.juego.radioNivelActual);
+            this.juego.subirNivel();
         }
         this.juego.hud.actualizarDebug("crecimiento: " + crecimiento);
     }
