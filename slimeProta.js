@@ -140,6 +140,7 @@ class SlimeProta extends Entidad{
 
         this.radio += crecimiento * 10;
         this.sprite.setSize(this.radio * this.scaleOffset);
+        this.collider.setSize(this.radio * 2);
 
         this.juego.agregarPuntos(1);
 

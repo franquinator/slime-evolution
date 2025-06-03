@@ -24,8 +24,15 @@ class Npc extends Entidad{
     }
     deambular(){
         if(this.puntoDeDestino === undefined || distancia(this.puntoDeDestino,this.position) < 10 ){
-            this.puntoDeDestino = {x:this.juego.fondo.position.x +(Math.random() * this.juego.fondo.width) ,
-                                   y:this.juego.fondo.position.y +(Math.random() * this.juego.fondo.height) };
+            this.puntoDeDestino = {x:this.getLimites().limX.min + (Math.random() * (this.juego.fondo.width - this.radio * 2)) ,
+                                   y:this.getLimites().limY.min + (Math.random() * (this.juego.fondo.height - this.radio * 2)) };
+            if(this.puntoDeDestino.x > this.getLimites().limX.max){
+                console.log("puntoDeDestino.x > this.getLimites().limX.max");
+            }
+            if(this.puntoDeDestino.y > this.getLimites().limY.max){
+                console.log("puntoDeDestino.y > this.getLimites().limY.max");
+            }
+            
         }
         //console.log(this.puntoDeDestino);
         //console.log(this.position);

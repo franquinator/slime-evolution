@@ -20,15 +20,15 @@ class Entidad{
         this.container = new PIXI.Container();
     }
     async MostrarCollider(){
-        const collider = new PIXI.Graphics()
+        this.collider = new PIXI.Graphics()
         .circle(0, 0, this.radio)
         .stroke({
             width: 1,
             color: 0x00ff00
         });
-        collider.zIndex = 12;
-        collider.name = "collider";
-        this.container.addChild(collider);
+        this.collider.zIndex = 12;
+        this.collider.name = "collider";
+        this.container.addChild(this.collider);
     }
     async cargarSprite(ruta,escalaExtra){
         let textura = await PIXI.Assets.load(ruta);
@@ -96,8 +96,8 @@ class Entidad{
 
 
         //console.log("pos: "+this.position," vel",this.vel," delta",delta," posicionDeFondo",posicionDeFondo," tamañoJuego",tamañoJuego);
-        this.position.x = clamp(this.position.x + this.vel.x * delta, posicionDeFondo.x, posicionDeFondo.x + tamañoJuego.width);
-        this.position.y = clamp(this.position.y + this.vel.y * delta, posicionDeFondo.y, posicionDeFondo.y + tamañoJuego.height);
+        this.position.x = clamp(this.position.x + this.vel.x * delta, this.getLimites().limX.min, this.getLimites().limX.max);
+        this.position.y = clamp(this.position.y + this.vel.y * delta, this.getLimites().limY.min, this.getLimites().limY.max);
 /* 
         if(this.position.x == undefined){
             debugger;
@@ -127,4 +127,16 @@ class Entidad{
     destroy(){
         this.container.destroy();
     }
+    getLimites(){
+        return {limX:this.getLimiteX(), limY:this.getLimiteY()};
+    }
+    getLimiteX(){
+        const fondo = this.juego.fondo;
+        return {min:fondo.position.x + this.radio, max:fondo.position.x + fondo.width - this.radio};
+    }
+    getLimiteY(){
+        const fondo = this.juego.fondo;
+        return {min:fondo.position.y + this.radio, max:fondo.position.y + fondo.height - this.radio};
+    }
+    
 }
