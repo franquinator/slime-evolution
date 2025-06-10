@@ -5,6 +5,7 @@ class SlimeProta extends Entidad{
 
         this.scaleOffset = 8;
         this.animacionActual = null;
+        this.colisionesActivas = false;
         this.MostrarCollider();
     }
     async inicializar(){
@@ -37,7 +38,9 @@ class SlimeProta extends Entidad{
         }
         //console.log(this.posicionEnPantalla(),this.juego.mousePos);
         this.asignarFuerzaQueMeLlevaAlMouse();
-        this.verificarColisiones();
+        if(this.colisionesActivas){
+            this.verificarColisiones();
+        }
         super.update();
     }
 
@@ -106,6 +109,9 @@ class SlimeProta extends Entidad{
             x: posicion.x, //* escalaX,
             y: posicion.y //* escalaY
         };
+    }
+    alternarColisiones(){
+        this.colisionesActivas = !this.colisionesActivas;
     }
 
     verificarColisiones(){

@@ -33,11 +33,15 @@ class Juego {
     this.delta = 0;
 
     //variables de componentes
-    this.hud = new Hud(this.app);;
+
+    this.grilla = new Grilla(this,200);
+    this.hud = new Hud(this);
     this.npcManager = new NpcManager(this);
     this.eventos = new Eventos(this);
     this.camara = new Camara(this);
     this.fondo = new Fondo(this,this.tamanioBase);
+
+    this.recursos = new Map();
 
     this.app.init({ width: this.ancho, height: this.alto }).then(() => {
       this.pixiListo();
@@ -48,19 +52,39 @@ class Juego {
     //agrega elementos generales
     this.camara.inicializar();
     await this.hud.inicializar();
+    console.log("hud listo")
     await this.fondo.inicializar();
+    console.log("fondo listo")
 
+    await this.precargarRecursos();
 
     this.slime = new SlimeProta(1500, 1500, 20, this);
     await this.slime.inicializar();
+    console.log("slime listo")
     this.cargarNivel1();
+    console.log("nivel 1 listo")
 
     //agrega elementos de PIXI
     window.__PIXI_APP__ = this.app;
     document.body.appendChild(this.app.canvas);
+    console.log("pixi listo")
+
+
 
     //comienza el gameloop
     this.app.ticker.add(() => this.gameLoop());
+    console.log("gameloop listo")
+  }
+  async precargarRecursos(){
+    this.recursos.set("Assets/texture.json",await PIXI.Assets.load("Assets/texture.json"));
+    this.recursos.set("Assets/Graficos/bg.jpg",await PIXI.Assets.load("Assets/Graficos/bg.jpg"));
+    this.recursos.set("Assets/Graficos/corazon1.png",await PIXI.Assets.load("Assets/Graficos/corazon1.png"));
+    this.recursos.set("Assets/Graficos/pqz.png",await PIXI.Assets.load("Assets/Graficos/pqz.png"));
+    this.recursos.set("Assets/Graficos/cat.png",await PIXI.Assets.load("Assets/Graficos/cat.png"));
+    this.recursos.set("Assets/Graficos/bacteria1.png",await PIXI.Assets.load("Assets/Graficos/bacteria1.png"));
+    this.recursos.set("Assets/Graficos/amoeba1.png",await PIXI.Assets.load("Assets/Graficos/amoeba1.png"));
+    this.recursos.set("Assets/Graficos/amoeba2.png",await PIXI.Assets.load("Assets/Graficos/amoeba2.png"));
+    this.recursos.set("Assets/Graficos/larva.pngq",await PIXI.Assets.load("Assets/Graficos/larva.png"));
   }
   //funciones de gameloop
   gameLoop() {
@@ -120,7 +144,7 @@ class Juego {
   //funciones para cambiar de nivel
   cargarNivel1() {
     console.log("cargando nivel 1");
-    this.npcManager.ponerNpcsEnTodoElMapa(Virus, 20);
+    //this.npcManager.ponerNpcsEnTodoElMapa(Virus, 1000);
     this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 1000);
   }
   cargarNivel2() {

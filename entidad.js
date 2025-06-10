@@ -18,6 +18,8 @@ class Entidad{
         this.friccion = 0.90;
 
         this.container = new PIXI.Container();
+        //this.celda = this.juego.grilla.obtenerCeldaEnPosicion(this.position.x,this.position.y);
+        //this.celda.agregame(this);
     }
     async MostrarCollider(){
         this.collider = new PIXI.Graphics()
@@ -43,10 +45,23 @@ class Entidad{
         this.juego.worldContainer.addChild(this.container);
          
     }
+    cargarSprite2(nombre,escalaExtra){
+        let textura = this.juego.recursos.get(nombre);
+        
+        this.sprite = new PIXI.Sprite(textura);
+        this.sprite.setSize(this.radio * 2 + escalaExtra);
+        this.sprite.anchor.set(0.5,0.5);
+
+        this.container.addChild(this.sprite);
+        this.container.zIndex = 11;
+
+        this.juego.worldContainer.addChild(this.container);
+    }
     update(){
         this.aplicarAceleracion();
         this.aplicarFriccion();
         this.aplicarVelocidad();
+        //this.actualizarMiPosicionEnLaGrilla();
     }
     
     asignarVelocidad(x,y){
@@ -119,6 +134,21 @@ class Entidad{
     aplicarFriccion(){
         this.vel.x *= this.friccion;
         this.vel.y *= this.friccion;
+    }
+    actualizarMiPosicionEnLaGrilla() {
+        const celdaActual = this.juego.grilla.obtenerCeldaEnPosicion(
+            this.position.x,
+            this.position.y
+        );
+
+        if (this.celda && celdaActual && celdaActual != this.celda) {
+            this.celda.sacame(this);
+            celdaActual.agregame(this);
+            this.celda = celdaActual;
+        } else if (!this.celda && celdaActual) {
+            console.log("agregando entidad a celda", celdaActual,"position",this.position);
+            this.celda = celdaActual;
+        }
     }
     render(){
         this.container.x = this.position.x;
