@@ -22,6 +22,7 @@ class SlimeProta extends Entidad{
         this.sprite.play();
         this.sprite.anchor.set(0.43,0.56);
         this.sprite.setSize(this.radio * this.scaleOffset);
+        this.container.zIndex = 12;
 
         this.container.name = "jugador";
 

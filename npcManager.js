@@ -81,6 +81,16 @@ class NpcManager{
       }
       return entidadesCercanas;
     }
+    obtenerEntidadesCercaDe(posicion, radio) {
+      let entidadesCercanas = [];
+      for (let i = 0; i < this.todasLasEntidades.length; i++) {
+        const entidadActual = this.todasLasEntidades[i];
+        if(distancia(entidadActual.position, posicion) < radio+entidadActual.radio){
+          entidadesCercanas.push(entidadActual);
+        }
+      }
+      return entidadesCercanas;
+    }
     obtenerEntidadesCercanasQuadtree(entidad, radio) {
       return this.quadtree.entidadesCercanas(entidad, radio);
     }

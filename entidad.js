@@ -61,7 +61,7 @@ class Entidad{
         this.aplicarAceleracion();
         this.aplicarFriccion();
         this.aplicarVelocidad();
-        //this.actualizarMiPosicionEnLaGrilla();
+        this.actualizarMiPosicionEnLaGrilla();
     }
     
     asignarVelocidad(x,y){
@@ -84,16 +84,16 @@ class Entidad{
         if (isNaN(x) || isNaN(y)) {
             throw new Error("Aceleración NaN detectada");
         }
-        const aceleracionNormalizada = normalizar(x,y);
-        this.aceleracion.x = x;
-        this.aceleracion.y = y;
+        const aceleracionNormalizada = normalizar(x, y);
+        this.aceleracion.x = aceleracionNormalizada.x * this.MultiplicadorDeAceleracion;
+        this.aceleracion.y = aceleracionNormalizada.y * this.MultiplicadorDeAceleracion;
     }
 
     asignarVelocidadNormalizada(x,y){
         if (isNaN(x) || isNaN(y)) {
             throw new Error("Velocidad NaN detectada");
         }
-        const velocidadNormalizada = normalizar(x,y);
+        const velocidadNormalizada = normalizar(x, y);
         this.vel.x = velocidadNormalizada.x;
         this.vel.y = velocidadNormalizada.y;
     }
@@ -146,7 +146,8 @@ class Entidad{
             celdaActual.agregame(this);
             this.celda = celdaActual;
         } else if (!this.celda && celdaActual) {
-            console.log("agregando entidad a celda", celdaActual,"position",this.position);
+            //console.log("agregando entidad a celda", celdaActual,"position",this.position);
+            celdaActual.agregame(this);
             this.celda = celdaActual;
         }
     }
@@ -167,6 +168,10 @@ class Entidad{
     getLimiteY(){
         const fondo = this.juego.fondo;
         return {min:fondo.position.y + this.radio, max:fondo.position.y + fondo.height - this.radio};
+    }
+    aplicarFuerza(fuerza){
+        this.aceleracion.x += fuerza.x;
+        this.aceleracion.y += fuerza.y;
     }
     
 }

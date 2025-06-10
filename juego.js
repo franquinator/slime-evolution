@@ -145,7 +145,7 @@ class Juego {
   cargarNivel1() {
     console.log("cargando nivel 1");
     //this.npcManager.ponerNpcsEnTodoElMapa(Virus, 1000);
-    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 1000);
+    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 100);
   }
   cargarNivel2() {
     console.log("cargando nivel 2");
