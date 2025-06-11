@@ -3,7 +3,7 @@ class NpcPasivo extends Npc {
         super(posX, posY, radio, juego, radioDeVision, velocidadMax);
         this.vel = { x: Math.random() * 10 - 5, y: Math.random() * 10 - 5 };
         this.aceleracion = { x: 0, y: 0 };
-        this.velocidadMax = 20;
+        this.velocidadMax = 10;
         this.maxForce = 0.2;
     }
     edges() {
@@ -79,20 +79,38 @@ class NpcPasivo extends Npc {
         }
         return steering;
     }
+    escape(slime){
+        let perceptionRadius = 400;
+        let steering = { x: 0, y: 0 };
+        let d = distancia(this.position, slime.position);
+        if(d < perceptionRadius){
+            console.log("slime cerca");
+            let direccionDeHuida = getUnitVector(slime.position,this.position);
+            direccionDeHuida = vectorMultiplicacion(direccionDeHuida, -1);
+            console.log(direccionDeHuida);
+            steering = vectorSuma(steering, direccionDeHuida);
+        }
+        return steering;
+    }
 
     flock(boids) {
+        //se puede ver a esto como motivaciones
+        //motivacion para alinearse juntarse y separarse
         let alignment = this.align(boids);
         let cohesion = this.cohesion(boids);
         let separation = this.separation(boids);
+        let escape = this.escape(this.juego.slime);
 
         alignment = vectorMultiplicacion(alignment, 0.2);
         cohesion = vectorMultiplicacion(cohesion, 0.2);
         separation = vectorMultiplicacion(separation, 0.6);
+        escape = vectorMultiplicacion(escape, 0.2);
 
 
         this.aceleracion = vectorSuma(this.aceleracion, alignment);
         this.aceleracion = vectorSuma(this.aceleracion, cohesion);
         this.aceleracion = vectorSuma(this.aceleracion, separation);
+        this.aceleracion = vectorSuma(this.aceleracion, escape);
     }
     subUpdate() {
         this.position = vectorSuma(this.position, this.vel);
