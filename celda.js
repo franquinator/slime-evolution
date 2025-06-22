@@ -12,6 +12,7 @@ class Celda {
     agregame(quien) {
       if (!quien) return;
       this.entidadesAca.push(quien);
+      quien.celda = this;
     }
   
     sacame(quien) {

@@ -121,4 +121,15 @@ function verificarValor(valor,nombre){
     console.error(nombre+" es invalida");
   }
 }
+function distanciaCuadrada(pos1, pos2) {
+  return (pos2.x - pos1.x) + (pos2.y - pos1.y);
+}
+function assertEquals(expected,actual){
+  if(actual == expected){
+    console.log("test superado en")
+  }
+  else{
+    console.log("deberia ser "+expected+" pero es " + actual)
+  }
+}
 

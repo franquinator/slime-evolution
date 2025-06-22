@@ -5,11 +5,14 @@ class NpcPasivo extends Npc {
         this.aceleracion = { x: 0, y: 0 };
         this.velocidadMax = 10;
         this.maxForce = 0.2;
+        this.npcsA100Mts = [];
+        this.celda = null;
+        this.juego.grilla.añadirNpcEnGrilla(this);
     }
     edges() {
-        if (this.position.x < 0) this.position.x = this.juego.fondo.width;
+        if (this.position.x < 0) this.position.x = this.juego.fondo.width-1;
         if (this.position.x > this.juego.fondo.width) this.position.x = 0;
-        if (this.position.y < 0) this.position.y = this.juego.fondo.height;
+        if (this.position.y < 0) this.position.y = this.juego.fondo.height-1;
         if (this.position.y > this.juego.fondo.height) this.position.y = 0;
     }
     align(boids) {
@@ -17,13 +20,17 @@ class NpcPasivo extends Npc {
         let steering = { x: 0, y: 0 };
         let total = 0;
 
-        for (let other of boids) {
+/*         for (let other of boids) {
             let d = distancia(this.position, other.position);
             if (other != this && d < perceptionRadius) {
 
                 steering = vectorSuma(steering, other.vel);
                 total++;
             }
+        } */
+        for(let npc of this.npcsA100Mts){
+            steering = vectorSuma(steering, npc.Npc.vel);
+            total++;
         }
 
         if (total > 0) {
@@ -39,7 +46,7 @@ class NpcPasivo extends Npc {
         let perceptionRadius = 100;
         let steering = { x: 0, y: 0 };
         let total = 0;
-        for (let other of boids) {
+/*         for (let other of boids) {
             let d = distancia(this.position, other.position);
             if (other != this && d < perceptionRadius) {
                 let diff = vectorResta(this.position, other.position);
@@ -47,6 +54,12 @@ class NpcPasivo extends Npc {
                 steering = vectorSuma(steering, diff);
                 total++;
             }
+        } */
+        for(let npc of this.npcsA100Mts){
+            let diff = vectorResta(this.position, npc.Npc.position);
+            diff = vectorDivision(diff, npc.Dist * npc.Dist);
+            steering = vectorSuma(steering, diff);
+            total++;
         }
         if (total > 0) {
             steering = vectorDivision(steering, total);
@@ -62,12 +75,16 @@ class NpcPasivo extends Npc {
         let steering = { x: 0, y: 0 };
         let total = 0;
 
-        for (let other of boids) {
+/*         for (let other of boids) {
             let d = distancia(this.position, other.position);
             if (other != this && d < perceptionRadius) {
                 steering = vectorSuma(steering, other.position);
                 total++;
             }
+        } */
+        for(let npc of this.npcsA100Mts){
+            steering = vectorSuma(steering, npc.Npc.position);
+            total++;
         }
 
         if (total > 0) {
@@ -84,10 +101,10 @@ class NpcPasivo extends Npc {
         let steering = { x: 0, y: 0 };
         let d = distancia(this.position, slime.position);
         if(d < perceptionRadius){
-            console.log("slime cerca");
+            //console.log("slime cerca");
             let direccionDeHuida = getUnitVector(slime.position,this.position);
             direccionDeHuida = vectorMultiplicacion(direccionDeHuida, -1);
-            console.log(direccionDeHuida);
+            //console.log(direccionDeHuida);
             steering = vectorSuma(steering, direccionDeHuida);
         }
         return steering;
@@ -101,16 +118,36 @@ class NpcPasivo extends Npc {
         let separation = this.separation(boids);
         let escape = this.escape(this.juego.slime);
 
-        alignment = vectorMultiplicacion(alignment, 0.2);
-        cohesion = vectorMultiplicacion(cohesion, 0.2);
-        separation = vectorMultiplicacion(separation, 0.6);
-        escape = vectorMultiplicacion(escape, 0.2);
+        alignment = vectorMultiplicacion(alignment, 1.5);
+        cohesion = vectorMultiplicacion(cohesion, 1);
+        separation = vectorMultiplicacion(separation, 2);
+        escape = vectorMultiplicacion(escape, 2);
 
 
         this.aceleracion = vectorSuma(this.aceleracion, alignment);
         this.aceleracion = vectorSuma(this.aceleracion, cohesion);
         this.aceleracion = vectorSuma(this.aceleracion, separation);
         this.aceleracion = vectorSuma(this.aceleracion, escape);
+    }
+    recopilarDatos(){
+        this.npcsA100Mts = [];
+        let celdasA100Mts = this.juego.grilla.obtenerCeldasADistancia(100,this.position.x,this.position.y)
+        for(let celda of celdasA100Mts){
+            for(let npc of celda.entidadesAca){
+
+                let d = distancia(this.position, npc.position);
+                if(npc != this && d < 50){
+                    this.npcsA100Mts.push({Npc:npc,Dist:d});
+                }
+                
+            }
+        }
+        /*         for(let npc of this.juego.npcManager.todasLasEntidades){
+            let d = distancia(this.position, npc.position);
+            if(npc != this && d < 100){
+                this.npcsA100Mts.push({Npc:npc,Dist:d});
+            }
+        } */
     }
     subUpdate() {
         this.position = vectorSuma(this.position, this.vel);
@@ -122,8 +159,13 @@ class NpcPasivo extends Npc {
         this.aceleracion = { x: 0, y: 0 };
     }
     update() {
-        this.edges();
+        this.actualizarPosicionEnGrilla();  
+        this.recopilarDatos();
         this.flock(this.juego.npcManager.todasLasEntidades);
         this.subUpdate();
+        this.edges();
+    }
+    actualizarPosicionEnGrilla(){
+        this.juego.grilla.actualizarNpcEnGrilla(this);
     }
 }

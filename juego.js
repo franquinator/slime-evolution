@@ -5,7 +5,7 @@ class Juego {
     this.ancho = window.innerWidth;
     this.alto = window.innerHeight;
     this.tamanioBase = 3000;
-    
+
     //variables de camara
     this.centro = {
       x: this.ancho / 2,
@@ -16,8 +16,8 @@ class Juego {
     //variables de cambio de nivel
     this.finalizado = false;
     this.nivelActual = 1;
-    this.radioNivel = [150,1300,2400];
-    this.radioNivelActual = this.radioNivel[this.nivelActual-1];
+    this.radioNivel = [150, 1300, 2400];
+    this.radioNivelActual = this.radioNivel[this.nivelActual - 1];
 
     //variables de juego
     this.slime = null;
@@ -27,19 +27,19 @@ class Juego {
       // this will make moving this container GPU powered
       isRenderGroup: true,
     });
-    
+
     //variables de fps
     this.ultimoFrame = performance.now();
     this.delta = 0;
 
     //variables de componentes
 
-    this.grilla = new Grilla(this,200);
+    this.grilla = new Grilla(this, 200);
     this.hud = new Hud(this);
     this.npcManager = new NpcManager(this);
     this.eventos = new Eventos(this);
     this.camara = new Camara(this);
-    this.fondo = new Fondo(this,this.tamanioBase);
+    this.fondo = new Fondo(this, this.tamanioBase);
 
     this.recursos = new Map();
 
@@ -69,22 +69,36 @@ class Juego {
     document.body.appendChild(this.app.canvas);
     console.log("pixi listo")
 
+    //this.testearTiempo();
 
 
     //comienza el gameloop
     this.app.ticker.add(() => this.gameLoop());
     console.log("gameloop listo")
+
+    //this.test();
   }
-  async precargarRecursos(){
-    this.recursos.set("Assets/texture.json",await PIXI.Assets.load("Assets/texture.json"));
-    this.recursos.set("Assets/Graficos/bg.jpg",await PIXI.Assets.load("Assets/Graficos/bg.jpg"));
-    this.recursos.set("Assets/Graficos/corazon1.png",await PIXI.Assets.load("Assets/Graficos/corazon1.png"));
-    this.recursos.set("Assets/Graficos/pqz.png",await PIXI.Assets.load("Assets/Graficos/pqz.png"));
-    this.recursos.set("Assets/Graficos/cat.png",await PIXI.Assets.load("Assets/Graficos/cat.png"));
-    this.recursos.set("Assets/Graficos/bacteria1.png",await PIXI.Assets.load("Assets/Graficos/bacteria1.png"));
-    this.recursos.set("Assets/Graficos/amoeba1.png",await PIXI.Assets.load("Assets/Graficos/amoeba1.png"));
-    this.recursos.set("Assets/Graficos/amoeba2.png",await PIXI.Assets.load("Assets/Graficos/amoeba2.png"));
-    this.recursos.set("Assets/Graficos/larva.pngq",await PIXI.Assets.load("Assets/Graficos/larva.png"));
+  test(){
+    this.grilla.test();
+  }
+  testearTiempo() {
+    let tiempoInicial = performance.now();
+    for (let i = 0; i < 1000; i++) {
+      this.npcManager.update();
+    }
+    let tiempoFinal = performance.now();
+    console.log("tiempo de update: " + (tiempoFinal - tiempoInicial) + "ms");
+  }
+  async precargarRecursos() {
+    this.recursos.set("Assets/texture.json", await PIXI.Assets.load("Assets/texture.json"));
+    this.recursos.set("Assets/Graficos/bg.jpg", await PIXI.Assets.load("Assets/Graficos/bg.jpg"));
+    this.recursos.set("Assets/Graficos/corazon1.png", await PIXI.Assets.load("Assets/Graficos/corazon1.png"));
+    this.recursos.set("Assets/Graficos/pqz.png", await PIXI.Assets.load("Assets/Graficos/pqz.png"));
+    this.recursos.set("Assets/Graficos/cat.png", await PIXI.Assets.load("Assets/Graficos/cat.png"));
+    this.recursos.set("Assets/Graficos/bacteria1.png", await PIXI.Assets.load("Assets/Graficos/bacteria1.png"));
+    this.recursos.set("Assets/Graficos/amoeba1.png", await PIXI.Assets.load("Assets/Graficos/amoeba1.png"));
+    this.recursos.set("Assets/Graficos/amoeba2.png", await PIXI.Assets.load("Assets/Graficos/amoeba2.png"));
+    this.recursos.set("Assets/Graficos/larva.pngq", await PIXI.Assets.load("Assets/Graficos/larva.png"));
   }
   //funciones de gameloop
   gameLoop() {
@@ -109,35 +123,36 @@ class Juego {
     this.slime.render();
   }
 
-  agregarPuntos(puntos){
+  agregarPuntos(puntos) {
     this.puntos += puntos;
     this.hud.actualizarPuntos(this.puntos);
   }
 
   perderVida() {
-/*     this.vidas--;
-    this.hud.actualizarVidas(this.vidas);
-    if (this.vidas <= 0) {
-      alert("¡Perdiste! (Presiona 'R' para reiniciar)");
-      this.finalizado = true;
-      this.app.stop();
-    } */
+    /*     this.vidas--;
+        this.hud.actualizarVidas(this.vidas);
+        if (this.vidas <= 0) {
+          alert("¡Perdiste! (Presiona 'R' para reiniciar)");
+          this.finalizado = true;
+          this.app.stop();
+        } */
   }
-  subirNivel(){
+  subirNivel() {
     this.nivelActual++;
-    console.log("subiendo nivel"+this.nivelActual);
-    if(this.nivelActual == 2){
+    console.log("subiendo nivel" + this.nivelActual);
+    
+    if (this.nivelActual == 2) {
       this.cargarNivel2();
     }
-    else if(this.nivelActual == 3){
+    else if (this.nivelActual == 3) {
       this.cargarNivel3();
     }
-    else if(this.nivelActual >= 4){
+    else if (this.nivelActual == 4) {
       alert("¡Ganaste! (Presiona 'R' para reiniciar)");
       this.finalizado = true;
       this.app.stop();
     }
-    this.radioNivelActual = this.radioNivel[this.nivelActual-1];
+    this.radioNivelActual = this.radioNivel[this.nivelActual - 1];
 
   }
 
@@ -145,7 +160,7 @@ class Juego {
   cargarNivel1() {
     console.log("cargando nivel 1");
     //this.npcManager.ponerNpcsEnTodoElMapa(Virus, 1000);
-    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 100);
+    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 1500);
   }
   cargarNivel2() {
     console.log("cargando nivel 2");
