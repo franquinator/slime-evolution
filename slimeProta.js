@@ -31,6 +31,12 @@ class SlimeProta extends Entidad{
         // Lo agregamos al mundo
         this.juego.worldContainer.addChild(this.container);
     }
+    edges() {
+        if (this.position.x < 0) this.position.x = this.juego.fondo.width-1;
+        if (this.position.x > this.juego.fondo.width) this.position.x = 0;
+        if (this.position.y < 0) this.position.y = this.juego.fondo.height-1;
+        if (this.position.y > this.juego.fondo.height) this.position.y = 0;
+    }
 
     update(){
         //console.log(this.position);
@@ -42,7 +48,9 @@ class SlimeProta extends Entidad{
         if(this.colisionesActivas){
             this.verificarColisiones();
         }
+        this.edges();
         super.update();
+        
     }
 
 

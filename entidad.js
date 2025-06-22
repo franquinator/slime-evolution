@@ -109,10 +109,13 @@ class Entidad{
         const posicionDeFondo = this.juego.fondo.position;
         const tamañoJuego = this.juego.fondo;
 
+        this.position.x += this.vel.x * delta;
+        this.position.y += this.vel.y * delta;
+
 
         //console.log("pos: "+this.position," vel",this.vel," delta",delta," posicionDeFondo",posicionDeFondo," tamañoJuego",tamañoJuego);
-        this.position.x = clamp(this.position.x + this.vel.x * delta, this.getLimites().limX.min, this.getLimites().limX.max);
-        this.position.y = clamp(this.position.y + this.vel.y * delta, this.getLimites().limY.min, this.getLimites().limY.max);
+        /* this.position.x = clamp(this.position.x + this.vel.x * delta, this.getLimites().limX.min, this.getLimites().limX.max);
+        this.position.y = clamp(this.position.y + this.vel.y * delta, this.getLimites().limY.min, this.getLimites().limY.max); */
 /* 
         if(this.position.x == undefined){
             debugger;
