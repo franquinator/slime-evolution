@@ -12,6 +12,7 @@ class Juego {
       y: this.alto / 2
     }
     this.mouse = { x: 0, y: 0 };
+    this.mousePresionado = false;
 
     //variables de cambio de nivel
     this.finalizado = false;

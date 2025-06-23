@@ -11,6 +11,7 @@ class Hud {
         this.panelDeDebug = null;
         this.textoDeDebug = null;
         this.botones = new Map(); // Para almacenar los botones creados
+        this.barraDeTurbo = {graficos: null, porcentaje: 0, anchoMaximo: 0};
     }
 
     async inicializar() {
@@ -19,6 +20,7 @@ class Hud {
         this.dibujarContadorFps();
         this.dibujarPanelDeDebug();
         this.dibujarBotonDePrueba();
+        this.dibujarBarraDeTurbo();
     }
 
     async dibujarCorazones() {
@@ -70,6 +72,35 @@ class Hud {
         this.crearBoton("Alternar colisiones", window.innerWidth - 150, 50, () => {
             this.juego.slime.alternarColisiones();
         });
+    }
+    dibujarBarraDeTurbo(){
+        const alto = 20
+        const ancho = window.innerWidth / 2;
+        const fondo = new PIXI.Graphics();
+        fondo.beginFill(0x4a4a4a);
+        fondo.drawRoundedRect(0, 0, ancho, alto, 8);
+        fondo.lineStyle(5, 0xffffff);
+        fondo.endFill();
+        fondo.position.set(ancho / 2, window.innerHeight - 80);
+        fondo.zIndex = 1;
+
+        const barra = new PIXI.Graphics();
+        barra.beginFill(0xff0000);
+        barra.drawRoundedRect(0, 0, ancho, alto, 8);
+        barra.endFill();
+        barra.position.set(ancho / 2, window.innerHeight - 80);
+        barra.zIndex = 2;
+
+        this.hud.addChild(barra);
+        this.hud.addChild(fondo);
+
+        this.barraDeTurbo.graficos = barra;
+        this.barraDeTurbo.fondo = fondo;
+        this.barraDeTurbo.anchoMaximo = ancho;
+    }
+    setBarraTurbo(porcentaje){
+        let porcentaLimitado = clamp(porcentaje,0,100)
+        this.barraDeTurbo.graficos.width = this.barraDeTurbo.anchoMaximo * porcentaLimitado / 100;
     }
 
     actualizarVidas(vidas) {
@@ -150,6 +181,7 @@ class Hud {
         
         return boton;
     }
+    
 
     eliminarBoton(texto) {
         const boton = this.botones.get(texto);

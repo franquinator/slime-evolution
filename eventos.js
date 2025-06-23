@@ -7,6 +7,13 @@ class Eventos{
         window.onmousemove = (evento) => {
             this.cuandoSeMueveElMouse(evento);
         };
+        window.addEventListener('mousedown', (evento) => {
+            this.cuandoSePresionaElMouse(evento);
+        });
+
+        window.addEventListener('mouseup', (evento) => {
+            this.cuandoSeSueltaElMouse(evento);
+        });
     
         window.addEventListener('keydown', (evento) => {
             this.cuandoSePresionaUnaTecla(evento)
@@ -33,5 +40,14 @@ class Eventos{
         if (key === 'd') {
             this.juego.hud.togglePanelDebug();
         }
+    }
+    cuandoSePresionaElMouse(evento) {
+        // Por ejemplo, marcar que el mouse está presionado
+        this.juego.mousePresionado = true;
+    }
+
+    cuandoSeSueltaElMouse(evento) {
+        // Marcar que el mouse ya no está presionado
+        this.juego.mousePresionado = false;
     }
 }

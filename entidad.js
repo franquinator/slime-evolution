@@ -104,8 +104,6 @@ class Entidad{
     }
     aplicarVelocidad() {
         const delta = this.juego.delta;
-        const posicionDeFondo = this.juego.fondo.position;
-        const tamañoJuego = this.juego.fondo;
 
         this.position.x += this.vel.x * delta;
         this.position.y += this.vel.y * delta;

@@ -5,6 +5,19 @@ class SlimeProta extends Entidad{
 
         this.scaleOffset = 8;
         this.animacionActual = null;
+
+        this.turboMax = 1000;
+        this.cantTurbo = 1000;
+        
+        this.penalizacionTurboInsuficiente = 1000;
+
+        this.velRecupTurbo = 0.5;
+        this.velCosumoTurbo = 1;
+
+        this.velTurbo = 1.5;
+        this.velNormal = 1;
+
+        this.multDeVelocidad = 1;
         this.MostrarCollider();
     }
     async inicializar(){
@@ -38,6 +51,8 @@ class SlimeProta extends Entidad{
     }
 
     update(){
+        this.sistemaTurbo();
+
         //console.log(this.position);
         if(this.tiempoDesdeUltimoDaño > 0){
             this.tiempoDesdeUltimoDaño -= this.juego.delta;
@@ -51,7 +66,24 @@ class SlimeProta extends Entidad{
         super.update();
         
     }
+    sistemaTurbo(){
+        if(this.juego.mousePresionado && this.cantTurbo > 0){
+            this.cantTurbo -= this.juego.delta * this.velCosumoTurbo;
 
+            this.multDeVelocidad = this.velTurbo;
+            
+            if(this.cantTurbo <= 0){
+                this.cantTurbo = -this.penalizacionTurboInsuficiente
+            }
+        }
+        else{
+            this.cantTurbo += this.juego.delta * this.velRecupTurbo;
+            this.cantTurbo = Math.min(this.turboMax,this.cantTurbo);
+
+            this.multDeVelocidad = this.velNormal;
+        }
+        this.juego.hud.setBarraTurbo(this.cantTurbo / this.turboMax * 100);
+    }
 
     render(){
         //efectoDeDaño();
@@ -107,7 +139,13 @@ class SlimeProta extends Entidad{
         if(this.sprite == null) return console.error("sprite null");
         ;
 
-        this.asignarAceleracionNormalizada(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
+        this.asignarAceleracion(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
+    }
+    aplicarVelocidad() {
+        const delta = this.juego.delta;
+
+        this.position.x += this.vel.x * delta * this.multDeVelocidad;
+        this.position.y += this.vel.y * delta * this.multDeVelocidad;
     }
     posicionEnPantalla(){
         //console.log("posicion jugador: " + this.position.x);
