@@ -18,17 +18,7 @@ class Entidad{
         this.friccion = 0.90;
 
         this.container = new PIXI.Container();
-    }
-    async MostrarCollider(){
-        const collider = new PIXI.Graphics()
-        .circle(0, 0, this.radio)
-        .stroke({
-            width: 1,
-            color: 0x00ff00
-        });
-        collider.zIndex = 12;
-        collider.name = "collider";
-        this.container.addChild(collider);
+        this.container.position.set(posX,posY);
     }
     async cargarSprite(ruta,escalaExtra){
         let textura = await PIXI.Assets.load(ruta);
@@ -127,4 +117,16 @@ class Entidad{
     destroy(){
         this.container.destroy();
     }
+
+    /*async MostrarCollider(){
+        const collider = new PIXI.Graphics()
+        .circle(0, 0, this.radio)
+        .stroke({
+            width: 1,
+            color: 0x00ff00
+        });
+        collider.zIndex = 12;
+        collider.name = "collider";
+        this.container.addChild(collider);
+    }*/
 }

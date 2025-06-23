@@ -5,7 +5,7 @@ class SlimeProta extends Entidad{
 
         this.scaleOffset = 8;
         this.animacionActual = null;
-        this.MostrarCollider();
+        //this.MostrarCollider();
     }
     async inicializar(){
         await this.cargarAnimacion();
@@ -122,26 +122,33 @@ class SlimeProta extends Entidad{
                     alert("Ganaste (Presiona 'F5' para reiniciar)");
                 } */
             }
-            else if(npcActual.radio > this.radio && this.tiempoDesdeUltimoDaño <= 0){
+            /*else if(npcActual.radio > this.radio && this.tiempoDesdeUltimoDaño <= 0){
                 this.juego.perderVida();
                 this.tiempoDesdeUltimoDaño = 1000;
-            }
+            }*/
         }
     }
 
     comer(comida){
         if(this.sprite == null) return;
 
-        //forma realista de sumas radios
-/*         var area = Math.PI * this.radio ** 2;
-        var area2 = Math.PI * comida.radio ** 2;
-        this.radio = Math.sqrt((area + area2) / Math.PI); */
         let crecimiento = comida.radio / this.radio;
+        
+        // Aumentar los puntos si es una larva en el nivel 2
+        if(this.juego.nivelActual === 2 && comida.constructor.name === 'Larva') {
+            this.juego.agregarPuntos(5); // Dar 5 puntos por cada larva en nivel 2
+        } else {
+            this.juego.agregarPuntos(1); // Puntos normales para otros casos
+        }
+
+        // Aumentar velocidad si come un pez en el nivel 3
+        if(this.juego.nivelActual === 3 && comida.constructor.name === 'Pez') {
+            this.MultiplicadorDeAceleracion *= 1.2; // Aumentar la aceleración en 20%
+            this.velocidadMax *= 1.2; // Aumentar la velocidad máxima en 20%
+        }
 
         this.radio += crecimiento * 10;
         this.sprite.setSize(this.radio * this.scaleOffset);
-
-        this.juego.agregarPuntos(1);
 
         this.juego.npcManager.eliminarEntidad(comida);
 

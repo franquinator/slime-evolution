@@ -4,8 +4,22 @@ class Npc extends Entidad{
         this.velocidadMax = velocidadMax;
         this.radioDeEscape = radioDeVision;
         this.distanciaAlJugador = 0;
+        this.tiempoQuieto = 0;
+        this.ultimaPosicion = {x: posX, y: posY};
+        this.tiempoMaximoQuieto = 5000; // 5 segundos
     }
     update() {
+        // Verificar si está quieto
+        if (distancia(this.position, this.ultimaPosicion) < 1) {
+            this.tiempoQuieto += this.juego.delta;
+            if (this.tiempoQuieto >= this.tiempoMaximoQuieto) {
+                this.juego.npcManager.eliminarEntidad(this);
+                return;
+            }
+        } else {
+            this.tiempoQuieto = 0;
+            this.ultimaPosicion = {x: this.position.x, y: this.position.y};
+        }
         super.update();
     }
 

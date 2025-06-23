@@ -1,10 +1,13 @@
 class Camara {
     constructor(juego) {
         this.juego = juego;
-        
-        // Inicializar la escala del contenedor
-        //this.juego.worldContainer.scale.set(1, 1);
+        // Inicializar la escala del contenedor con un valor inicial apropiado
+        this.juego.worldContainer.scale.set(0.8, 0.8);
+        this.escalaMinima = 0.2;  // Valor base para nivel 1
+        this.escalaMaxima = 1.5;
+        this.factorSuavizado = 0.1;
     }
+
     inicializar() {
         this.juego.app.stage.addChild(this.juego.worldContainer);
     }
@@ -45,12 +48,11 @@ class Camara {
         targetY = Math.max(limitesCamara.minY, Math.min(limitesCamara.maxY, targetY));
 
         // Aplicar suavizado al movimiento
-        const factorSuavizado = 0.1;
         const deltaX = targetX - worldContainer.x;
         const deltaY = targetY - worldContainer.y;
 
-        worldContainer.x += deltaX * factorSuavizado;
-        worldContainer.y += deltaY * factorSuavizado;
+        worldContainer.x += deltaX * this.factorSuavizado;
+        worldContainer.y += deltaY * this.factorSuavizado;
 
         // Validación de valores numéricos
         if (isNaN(worldContainer.x) || isNaN(worldContainer.y)) {
@@ -65,25 +67,44 @@ class Camara {
         }
     }
 
+    actualizarLimitesZoom() {
+        // Ajustar límites de zoom según el nivel
+        if (this.juego.nivelActual === 1) {
+            this.escalaMinima = 0.2;
+            this.escalaMaxima = 1.5;
+        } else if (this.juego.nivelActual === 2) {
+            this.escalaMinima = 0.15;
+            this.escalaMaxima = 1.2;
+        } else {
+            this.escalaMinima = 0.05;
+            this.escalaMaxima = 1.5;
+        }
+    }
+
     ajustarTamanio(tamanioDeAumento) {
         const worldContainer = this.juego.worldContainer;
-        const escalaMinima = 0.1;
-        const escalaMaxima = 2;
+        const mouse = this.juego.mouse;
     
-        // Nueva escala
-        const nuevaEscalaX = Math.max(escalaMinima, Math.min(worldContainer.scale.x + tamanioDeAumento, escalaMaxima));
-        const nuevaEscalaY = Math.max(escalaMinima, Math.min(worldContainer.scale.y + tamanioDeAumento, escalaMaxima));
+        // Actualizar límites de zoom según el nivel
+        this.actualizarLimitesZoom();
+    
+        // Calcular la posición del mouse relativa al contenedor del mundo
+        const mouseX = (mouse.x - worldContainer.x) / worldContainer.scale.x;
+        const mouseY = (mouse.y - worldContainer.y) / worldContainer.scale.y;
+    
+        // Calcular la nueva escala
+        const nuevaEscalaX = Math.max(this.escalaMinima, 
+            Math.min(worldContainer.scale.x + tamanioDeAumento, this.escalaMaxima));
+        const nuevaEscalaY = Math.max(this.escalaMinima, 
+            Math.min(worldContainer.scale.y + tamanioDeAumento, this.escalaMaxima));
     
         // Calcular el cambio de escala
         const factorCambioX = nuevaEscalaX / worldContainer.scale.x;
         const factorCambioY = nuevaEscalaY / worldContainer.scale.y;
     
-        // Ajustar la posición para mantener el centro
-        const centroX = this.juego.ancho / 2;
-        const centroY = this.juego.alto / 2;
-    
-        worldContainer.x = centroX - (centroX - worldContainer.x) * factorCambioX;
-        worldContainer.y = centroY - (centroY - worldContainer.y) * factorCambioY;
+        // Ajustar la posición para mantener el punto del mouse fijo
+        worldContainer.x = mouse.x - mouseX * nuevaEscalaX;
+        worldContainer.y = mouse.y - mouseY * nuevaEscalaY;
     
         // Aplicar la nueva escala
         worldContainer.scale.set(nuevaEscalaX, nuevaEscalaY);
