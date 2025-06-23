@@ -95,7 +95,7 @@ class Juego {
     document.body.appendChild(this.app.canvas);
     console.log("pixi listo")
 
-    //this.testearTiempo();
+    this.testearTiempo();
 
 
     //comienza el gameloop
@@ -109,7 +109,7 @@ class Juego {
   }
   testearTiempo() {
     let tiempoInicial = performance.now();
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 100; i++) {
       this.npcManager.update();
     }
     let tiempoFinal = performance.now();
@@ -148,7 +148,6 @@ class Juego {
       this.fpsActual = this.fpsContador;
       this.fpsContador = 0;
       this.ultimoFpsUpdate = ahora;
-      console.log(`FPS: ${this.fpsActual}`);
     }
     
     this.hud.actualizarFPS(this.fpsActual);
@@ -195,8 +194,8 @@ class Juego {
   //funciones para cambiar de nivel
   cargarNivel1() {
     console.log("cargando nivel 1");
-    //this.npcManager.ponerNpcsEnTodoElMapa(Virus, 1000);
-    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 1500);
+    this.npcManager.ponerNpcsEnTodoElMapa(Virus, 10);
+    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 3000);
   }
   cargarNivel2() {
     console.log("cargando nivel 2");

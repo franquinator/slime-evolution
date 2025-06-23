@@ -28,7 +28,8 @@ class NpcPasivo extends Npc {
                 total++;
             }
         } */
-        for(let npc of this.npcsA50Mts){
+        for(let npc of boids){
+            if(npc.Dist > 50) continue;
             steering = vectorSuma(steering, npc.Npc.vel);
             total++;
         }
@@ -42,8 +43,7 @@ class NpcPasivo extends Npc {
         return steering;
     }
 
-    separation(boids) {
-        let perceptionRadius = 100;
+    separation(boids,perceptionRadius) {
         let steering = { x: 0, y: 0 };
         let total = 0;
 /*         for (let other of boids) {
@@ -55,12 +55,14 @@ class NpcPasivo extends Npc {
                 total++;
             }
         } */
-        for(let npc of this.npcsA50Mts){
+        for(let npc of boids){
+            if(npc.Dist > perceptionRadius) continue; //no me separo de los grandes
             let diff = vectorResta(this.position, npc.Npc.position);
             diff = vectorDivision(diff, npc.Dist * npc.Dist);
             steering = vectorSuma(steering, diff);
             total++;
         }
+
         if (total > 0) {
             steering = vectorDivision(steering, total);
             steering = setMag(steering, this.velocidadMax);
@@ -82,7 +84,8 @@ class NpcPasivo extends Npc {
                 total++;
             }
         } */
-        for(let npc of this.npcsA50Mts){
+        for(let npc of boids){
+            if(npc.Dist > 50) continue;
             steering = vectorSuma(steering, npc.Npc.position);
             total++;
         }
@@ -113,40 +116,45 @@ class NpcPasivo extends Npc {
     flock(boids) {
         //se puede ver a esto como motivaciones
         //motivacion para alinearse juntarse y separarse
-        let alignment = this.align(boids);
-        let cohesion = this.cohesion(boids);
-        let separation = this.separation(boids);
+
+        let alignment = this.align(this.npcsA50Mts);
+        let cohesion = this.cohesion(this.npcsA50Mts);
+        let separation = this.separation(this.npcsA50Mts,50);
         let escape = this.escape(this.juego.slime);
+        let separacionDeGrandes = this.separation(this.npcsMalosParaMiA50mts,400);
 
         alignment = vectorMultiplicacion(alignment, 1.5);
-        cohesion = vectorMultiplicacion(cohesion, 1);
-        separation = vectorMultiplicacion(separation, 4);
+        cohesion = vectorMultiplicacion(cohesion, 0.5);
+        separation = vectorMultiplicacion(separation, 2);
         escape = vectorMultiplicacion(escape, 2);
+        separacionDeGrandes = vectorMultiplicacion(separacionDeGrandes, 4);
 
 
         this.aceleracion = vectorSuma(this.aceleracion, alignment);
         this.aceleracion = vectorSuma(this.aceleracion, cohesion);
         this.aceleracion = vectorSuma(this.aceleracion, separation);
         this.aceleracion = vectorSuma(this.aceleracion, escape);
+        this.aceleracion = vectorSuma(this.aceleracion, separacionDeGrandes);
     }
     recopilarDatos(){
-        this.npcsMalosParaMiA50mts = [];
+        const distBusqueda = 100;
+        
         this.npcsA50Mts = [];
-        let celdasA100Mts = this.juego.grilla.obtenerCeldasADistancia(50,this.position.x,this.position.y)
+        let celdasA100Mts = this.juego.grilla.obtenerCeldasADistancia(distBusqueda,this.position.x,this.position.y)
         for(let celda of celdasA100Mts){
             for(let npc of celda.entidadesAca){
                 let d = distancia(this.position, npc.position);
-                if(npc != this && d < 50){
-
-                    if(npc.radio > this.radio){
-                        this.npcsMalosParaMiA50mts.push({Npc:npc,Dist:d});
-                    }
-                    else{
+                if(npc != this && d < distBusqueda){
                         this.npcsA50Mts.push({Npc:npc,Dist:d});
-                    }
-                    
                 }
-                
+            }
+        }
+
+        this.npcsMalosParaMiA50mts = [];
+        for(let npc of this.juego.npcManager.todasLasEntidades.get("Virus")){
+            let d = distancia(this.position, npc.position);
+            if(npc != this && d < 400){
+                this.npcsMalosParaMiA50mts.push({Npc:npc,Dist:d});
             }
         }
         /*         for(let npc of this.juego.npcManager.todasLasEntidades){

@@ -13,7 +13,7 @@ class Ameba extends NpcPasivo{
         //this.MostrarCollider();
     }
 }
-class Virus extends NpcAgresivo{
+class Virus extends NpcPasivo{
     constructor(posX,posY,juego){
         super(posX,posY,100,juego,300,0.3);
         this.cargarSprite("Assets/Graficos/bacteria1.png",40);

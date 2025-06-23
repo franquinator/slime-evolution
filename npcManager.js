@@ -12,14 +12,23 @@ class NpcManager{
       //this.spatialHash = new SpatialHash(100); // Tamaño de celda de 100 pixels
   
       this.juego = juego;
-      this.todasLasEntidades = [];
+      this.todasLasEntidades = new Map();
     }
     update(){
       //this.actualizarSpatialHash();
-      for(let i = 0; i < this.todasLasEntidades.length; i++){
+      for(let grupoEntidades of this.todasLasEntidades){
+        this.actualizarGrupoDeEntidades(grupoEntidades[1]);
+      }
+/*       for(let i = 0; i < this.todasLasEntidades.length; i++){
         this.todasLasEntidades[i].update();
         this.todasLasEntidades[i].render();
-      }
+      } */
+    }
+    actualizarGrupoDeEntidades(grupo){
+        for(let entidad of grupo){
+            entidad.update();
+            entidad.render();
+        }
     }
     sacarNpcs(clase) {
       console.log("npc sacados");
@@ -45,7 +54,13 @@ class NpcManager{
     ponerNpcsEnZona(clase, cantidad, x, y,ancho,largo) {
       for (let i = 0; i < cantidad; i++) {
         const npcActual = new clase(x + Math.random() * ancho, y + Math.random() * largo, this.juego);
-        this.todasLasEntidades.push(npcActual);
+        if(this.todasLasEntidades.has(clase.name)){
+            this.todasLasEntidades.get(clase.name).push(npcActual);
+        }
+        else{
+            this.todasLasEntidades.set(clase.name,[npcActual])
+        }
+        
       }
     }
     ponerNpcsAlrededorDeCuadrado(clase, cantidad, x, y,ancho,largo) {
