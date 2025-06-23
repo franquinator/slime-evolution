@@ -4,7 +4,7 @@ class Juego {
     this.app = new PIXI.Application();
     this.ancho = window.innerWidth;
     this.alto = window.innerHeight;
-    this.tamanioBase = 3000;
+    this.tamanioBase = 6000;
 
     //variables de camara
     this.centro = {
@@ -102,11 +102,11 @@ class Juego {
   }
   //funciones de gameloop
   gameLoop() {
-    this.actualizarDeltaTime();
+    /* this.actualizarDeltaTime();
     this.camara.actualizar();
     this.actualizarContadorFps();
     this.actualizarProtagonista();
-    this.npcManager.update();
+    this.npcManager.update(); */
   }
 
   actualizarDeltaTime() {
@@ -160,7 +160,7 @@ class Juego {
   cargarNivel1() {
     console.log("cargando nivel 1");
     //this.npcManager.ponerNpcsEnTodoElMapa(Virus, 1000);
-    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 1500);
+    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 3000);
   }
   cargarNivel2() {
     console.log("cargando nivel 2");

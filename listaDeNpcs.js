@@ -5,10 +5,10 @@ class Ameba extends NpcPasivo{
 
         let probabilidadDeSprite = Math.random();
         if(probabilidadDeSprite < 0.5){
-            this.cargarSprite("Assets/Graficos/amoeba1.png",10);
+            this.cargarSprite2("Assets/Graficos/amoeba1.png",10);
         }
         else{
-            this.cargarSprite("Assets/Graficos/amoeba2.png",10);
+            this.cargarSprite2("Assets/Graficos/amoeba2.png",10);
         }
         this.MostrarCollider();
     }
