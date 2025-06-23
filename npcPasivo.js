@@ -5,7 +5,7 @@ class NpcPasivo extends Npc {
         this.aceleracion = { x: 0, y: 0 };
         this.velocidadMax = 10;
         this.maxForce = 0.2;
-        this.npcsA100Mts = [];
+        this.npcsA50Mts = [];
         this.celda = null;
         this.juego.grilla.añadirNpcEnGrilla(this);
     }
@@ -28,7 +28,7 @@ class NpcPasivo extends Npc {
                 total++;
             }
         } */
-        for(let npc of this.npcsA100Mts){
+        for(let npc of this.npcsA50Mts){
             steering = vectorSuma(steering, npc.Npc.vel);
             total++;
         }
@@ -55,7 +55,7 @@ class NpcPasivo extends Npc {
                 total++;
             }
         } */
-        for(let npc of this.npcsA100Mts){
+        for(let npc of this.npcsA50Mts){
             let diff = vectorResta(this.position, npc.Npc.position);
             diff = vectorDivision(diff, npc.Dist * npc.Dist);
             steering = vectorSuma(steering, diff);
@@ -82,7 +82,7 @@ class NpcPasivo extends Npc {
                 total++;
             }
         } */
-        for(let npc of this.npcsA100Mts){
+        for(let npc of this.npcsA50Mts){
             steering = vectorSuma(steering, npc.Npc.position);
             total++;
         }
@@ -120,7 +120,7 @@ class NpcPasivo extends Npc {
 
         alignment = vectorMultiplicacion(alignment, 1.5);
         cohesion = vectorMultiplicacion(cohesion, 1);
-        separation = vectorMultiplicacion(separation, 2);
+        separation = vectorMultiplicacion(separation, 4);
         escape = vectorMultiplicacion(escape, 2);
 
 
@@ -130,14 +130,21 @@ class NpcPasivo extends Npc {
         this.aceleracion = vectorSuma(this.aceleracion, escape);
     }
     recopilarDatos(){
-        this.npcsA100Mts = [];
-        let celdasA100Mts = this.juego.grilla.obtenerCeldasADistancia(100,this.position.x,this.position.y)
+        this.npcsMalosParaMiA50mts = [];
+        this.npcsA50Mts = [];
+        let celdasA100Mts = this.juego.grilla.obtenerCeldasADistancia(50,this.position.x,this.position.y)
         for(let celda of celdasA100Mts){
             for(let npc of celda.entidadesAca){
-
                 let d = distancia(this.position, npc.position);
                 if(npc != this && d < 50){
-                    this.npcsA100Mts.push({Npc:npc,Dist:d});
+
+                    if(npc.radio > this.radio){
+                        this.npcsMalosParaMiA50mts.push({Npc:npc,Dist:d});
+                    }
+                    else{
+                        this.npcsA50Mts.push({Npc:npc,Dist:d});
+                    }
+                    
                 }
                 
             }
