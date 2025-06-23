@@ -74,8 +74,19 @@ class NpcManager{
     obtenerEntidadesCercanasSinOptimizar(entidad, radio) {
       let entidadesCercanas = [];
       for (let i = 0; i < this.todasLasEntidades.length; i++) {
-        if(this.todasLasEntidades[i] !== entidad && distancia(this.todasLasEntidades[i].position, entidad.position) < radio){
-          entidadesCercanas.push(this.todasLasEntidades[i]);
+        const entidadActual = this.todasLasEntidades[i];
+        if(entidadActual !== entidad && distancia(entidadActual.position, entidad.position) < radio+entidadActual.radio){
+          entidadesCercanas.push(entidadActual);
+        }
+      }
+      return entidadesCercanas;
+    }
+    obtenerEntidadesCercaDe(posicion, radio) {
+      let entidadesCercanas = [];
+      for (let i = 0; i < this.todasLasEntidades.length; i++) {
+        const entidadActual = this.todasLasEntidades[i];
+        if(distancia(entidadActual.position, posicion) < radio+entidadActual.radio){
+          entidadesCercanas.push(entidadActual);
         }
       }
       return entidadesCercanas;

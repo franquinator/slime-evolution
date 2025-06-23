@@ -69,9 +69,67 @@ function normalizar(x,y){
 function clamp(valor, min, max) {
   return Math.max(min, Math.min(max, valor));
 }
+function limit(vector, max) {
+  const magnitudActual = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+  
+  if (magnitudActual > max && magnitudActual > 0) {
+    const ratio = max / magnitudActual;
+    return {
+      x: vector.x * ratio,
+      y: vector.y * ratio
+    };
+  }
+  
+  return vector;
+}
+function vectorSuma(vector1, vector2) {
+  return {
+    x: vector1.x + vector2.x,
+    y: vector1.y + vector2.y
+  };
+}
+function vectorResta(vector1, vector2) {
+  return {
+    x: vector1.x - vector2.x,
+    y: vector1.y - vector2.y
+  };
+}
+function vectorMultiplicacion(vector, factor) {
+  return {
+    x: vector.x * factor,
+    y: vector.y * factor
+  };
+}
+function vectorDivision(vector, factor) {
+  return {
+    x: vector.x / factor,
+    y: vector.y / factor
+  };
+}
+function setMag(vector, magnitud) {
+  // Primero normalizamos el vector (lo convertimos en un vector unitario)
+  const vectorNormalizado = normalizar(vector.x, vector.y);
+  
+  // Luego multiplicamos por la magnitud deseada
+  return {
+    x: vectorNormalizado.x * magnitud,
+    y: vectorNormalizado.y * magnitud
+  };
+}
 function verificarValor(valor,nombre){
   if(!valor){
     console.error(nombre+" es invalida");
+  }
+}
+function distanciaCuadrada(pos1, pos2) {
+  return (pos2.x - pos1.x) + (pos2.y - pos1.y);
+}
+function assertEquals(expected,actual){
+  if(actual == expected){
+    console.log("test superado en")
+  }
+  else{
+    console.log("deberia ser "+expected+" pero es " + actual)
   }
 }
 

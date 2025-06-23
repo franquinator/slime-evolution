@@ -18,7 +18,17 @@ class Entidad{
         this.friccion = 0.90;
 
         this.container = new PIXI.Container();
-        this.container.position.set(posX,posY);
+    }
+    async MostrarCollider(){
+        const collider = new PIXI.Graphics()
+        .circle(0, 0, this.radio)
+        .stroke({
+            width: 1,
+            color: 0x00ff00
+        });
+        collider.zIndex = 12;
+        collider.name = "collider";
+        this.container.addChild(collider);
     }
     async cargarSprite(ruta,escalaExtra){
         let textura = await PIXI.Assets.load(ruta);
@@ -33,10 +43,23 @@ class Entidad{
         this.juego.worldContainer.addChild(this.container);
          
     }
+    cargarSprite2(nombre,escalaExtra){
+        let textura = this.juego.recursos.get(nombre);
+        
+        this.sprite = new PIXI.Sprite(textura);
+        this.sprite.setSize(this.radio * 2 + escalaExtra);
+        this.sprite.anchor.set(0.5,0.5);
+
+        this.container.addChild(this.sprite);
+        this.container.zIndex = 11;
+
+        this.juego.worldContainer.addChild(this.container);
+    }
     update(){
         this.aplicarAceleracion();
         this.aplicarFriccion();
         this.aplicarVelocidad();
+        this.actualizarMiPosicionEnLaGrilla();
     }
     
     asignarVelocidad(x,y){
@@ -59,16 +82,16 @@ class Entidad{
         if (isNaN(x) || isNaN(y)) {
             throw new Error("Aceleración NaN detectada");
         }
-        const aceleracionNormalizada = normalizar(x,y);
-        this.aceleracion.x = x;
-        this.aceleracion.y = y;
+        const aceleracionNormalizada = normalizar(x, y);
+        this.aceleracion.x = aceleracionNormalizada.x * this.MultiplicadorDeAceleracion;
+        this.aceleracion.y = aceleracionNormalizada.y * this.MultiplicadorDeAceleracion;
     }
 
     asignarVelocidadNormalizada(x,y){
         if (isNaN(x) || isNaN(y)) {
             throw new Error("Velocidad NaN detectada");
         }
-        const velocidadNormalizada = normalizar(x,y);
+        const velocidadNormalizada = normalizar(x, y);
         this.vel.x = velocidadNormalizada.x;
         this.vel.y = velocidadNormalizada.y;
     }
@@ -84,10 +107,13 @@ class Entidad{
         const posicionDeFondo = this.juego.fondo.position;
         const tamañoJuego = this.juego.fondo;
 
+        this.position.x += this.vel.x * delta;
+        this.position.y += this.vel.y * delta;
+
 
         //console.log("pos: "+this.position," vel",this.vel," delta",delta," posicionDeFondo",posicionDeFondo," tamañoJuego",tamañoJuego);
-        this.position.x = clamp(this.position.x + this.vel.x * delta, posicionDeFondo.x, posicionDeFondo.x + tamañoJuego.width);
-        this.position.y = clamp(this.position.y + this.vel.y * delta, posicionDeFondo.y, posicionDeFondo.y + tamañoJuego.height);
+        /* this.position.x = clamp(this.position.x + this.vel.x * delta, this.getLimites().limX.min, this.getLimites().limX.max);
+        this.position.y = clamp(this.position.y + this.vel.y * delta, this.getLimites().limY.min, this.getLimites().limY.max); */
 /* 
         if(this.position.x == undefined){
             debugger;
@@ -110,6 +136,22 @@ class Entidad{
         this.vel.x *= this.friccion;
         this.vel.y *= this.friccion;
     }
+    actualizarMiPosicionEnLaGrilla() {
+        const celdaActual = this.juego.grilla.obtenerCeldaEnPosicion(
+            this.position.x,
+            this.position.y
+        );
+
+        if (this.celda && celdaActual && celdaActual != this.celda) {
+            this.celda.sacame(this);
+            celdaActual.agregame(this);
+            this.celda = celdaActual;
+        } else if (!this.celda && celdaActual) {
+            //console.log("agregando entidad a celda", celdaActual,"position",this.position);
+            celdaActual.agregame(this);
+            this.celda = celdaActual;
+        }
+    }
     render(){
         this.container.x = this.position.x;
         this.container.y = this.position.y;
@@ -117,16 +159,4 @@ class Entidad{
     destroy(){
         this.container.destroy();
     }
-
-    /*async MostrarCollider(){
-        const collider = new PIXI.Graphics()
-        .circle(0, 0, this.radio)
-        .stroke({
-            width: 1,
-            color: 0x00ff00
-        });
-        collider.zIndex = 12;
-        collider.name = "collider";
-        this.container.addChild(collider);
-    }*/
 }

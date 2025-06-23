@@ -5,7 +5,7 @@ class SlimeProta extends Entidad{
 
         this.scaleOffset = 8;
         this.animacionActual = null;
-        //this.MostrarCollider();
+        this.MostrarCollider();
     }
     async inicializar(){
         await this.cargarAnimacion();
@@ -21,6 +21,7 @@ class SlimeProta extends Entidad{
         this.sprite.play();
         this.sprite.anchor.set(0.43,0.56);
         this.sprite.setSize(this.radio * this.scaleOffset);
+        this.container.zIndex = 12;
 
         this.container.name = "jugador";
 
@@ -28,6 +29,12 @@ class SlimeProta extends Entidad{
 
         // Lo agregamos al mundo
         this.juego.worldContainer.addChild(this.container);
+    }
+    edges() {
+        if (this.position.x < 0) this.position.x = this.juego.fondo.width-1;
+        if (this.position.x > this.juego.fondo.width) this.position.x = 0;
+        if (this.position.y < 0) this.position.y = this.juego.fondo.height-1;
+        if (this.position.y > this.juego.fondo.height) this.position.y = 0;
     }
 
     update(){
@@ -37,8 +44,12 @@ class SlimeProta extends Entidad{
         }
         //console.log(this.posicionEnPantalla(),this.juego.mousePos);
         this.asignarFuerzaQueMeLlevaAlMouse();
-        this.verificarColisiones();
+        if(this.colisionesActivas){
+            this.verificarColisiones();
+        }
+        this.edges();
         super.update();
+        
     }
 
 
@@ -107,6 +118,9 @@ class SlimeProta extends Entidad{
             y: posicion.y //* escalaY
         };
     }
+    alternarColisiones(){
+        this.colisionesActivas = !this.colisionesActivas;
+    }
 
     verificarColisiones(){
         //const colisiones = this.juego.obtenerEntidadesCercanasSinOptimizar(this,this.radio);
@@ -149,6 +163,8 @@ class SlimeProta extends Entidad{
 
         this.radio += crecimiento * 10;
         this.sprite.setSize(this.radio * this.scaleOffset);
+
+        this.juego.agregarPuntos(1);
 
         this.juego.npcManager.eliminarEntidad(comida);
 
