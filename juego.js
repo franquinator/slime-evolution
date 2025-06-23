@@ -40,7 +40,7 @@ class Juego {
 
     //variables de componentes
 
-    this.grilla = new Grilla(this, 200);
+    this.grilla = new Grilla(this, 400);
     this.hud = new Hud(this);
     this.npcManager = new NpcManager(this);
     this.eventos = new Eventos(this);
@@ -127,7 +127,7 @@ class Juego {
   }
   //funciones de gameloop
   gameLoop() {
-    /* this.actualizarDeltaTime();
+    this.actualizarDeltaTime();
     this.camara.actualizar();
     this.actualizarContadorFps();
     this.actualizarProtagonista();
