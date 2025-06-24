@@ -20,6 +20,7 @@ class SlimeProta extends Entidad{
         this.multDeVelocidad = 1;
         this.MostrarCollider();
     }
+
     async inicializar(){
         await this.cargarAnimacion();
     }
@@ -43,6 +44,7 @@ class SlimeProta extends Entidad{
         // Lo agregamos al mundo
         this.juego.worldContainer.addChild(this.container);
     }
+
     edges() {
         if (this.position.x < 0) this.position.x = this.juego.fondo.width-1;
         if (this.position.x > this.juego.fondo.width) this.position.x = 0;
@@ -53,11 +55,10 @@ class SlimeProta extends Entidad{
     update(){
         this.sistemaTurbo();
 
-        //console.log(this.position);
         if(this.tiempoDesdeUltimoDaño > 0){
             this.tiempoDesdeUltimoDaño -= this.juego.delta;
         }
-        //console.log(this.posicionEnPantalla(),this.juego.mousePos);
+
         this.asignarFuerzaQueMeLlevaAlMouse();
         if(this.colisionesActivas){
             this.verificarColisiones();
@@ -66,6 +67,7 @@ class SlimeProta extends Entidad{
         super.update();
         
     }
+
     sistemaTurbo(){
         if(this.juego.mousePresionado && this.cantTurbo > 0){
             this.cantTurbo -= this.juego.delta * this.velCosumoTurbo;
@@ -112,6 +114,7 @@ class SlimeProta extends Entidad{
         
         super.render();
     }
+
     cambiarAnimacion(nombreAnimacion) {
         if (!this.sheet) {
             return;
@@ -134,50 +137,41 @@ class SlimeProta extends Entidad{
             this.juego.mouse,
             this.posicionEnPantalla()
         );
-        //console.log("mouse: "+this.juego.mouse.x);
-        //console.log("posicion: "+this.posicionEnPantalla().x);
-        if(this.sprite == null) return console.error("sprite null");
-        ;
 
         this.asignarAceleracion(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
     }
+
     aplicarVelocidad() {
         const delta = this.juego.delta;
 
         this.position.x += this.vel.x * delta * this.multDeVelocidad;
         this.position.y += this.vel.y * delta * this.multDeVelocidad;
     }
+    
     posicionEnPantalla(){
-        //console.log("posicion jugador: " + this.position.x);
-        //console.log("juego: " + this.juego.worldContainer.x);
         const posicion = this.juego.worldContainer.toGlobal(this.position);
         return {
             x: posicion.x, //* escalaX,
             y: posicion.y //* escalaY
         };
     }
+
     alternarColisiones(){
         this.colisionesActivas = !this.colisionesActivas;
     }
 
     verificarColisiones(){
-        //const colisiones = this.juego.obtenerEntidadesCercanasSinOptimizar(this,this.radio);
-        //const colisiones = this.juego.obtenerEntidadesCercanasQuadtree(this,this.radio);
         const colisiones = this.juego.grilla.obtenerColisionesCon(this);
-        //const posiblesColisiones = this.juego.quadtree.recuperar(this);
-        //console.log(colisiones)
+
         for (let i = 0; i < colisiones.length; i++) {
             const npcActual = colisiones[i];
             if(npcActual.radio <= this.radio && !npcActual.fuiEliminado){
                 this.comer(npcActual);
-/*                 if(this.juego.todasLasEntidades.length == 0){
-                    alert("Ganaste (Presiona 'F5' para reiniciar)");
-                } */
             }
-            /*else if(npcActual.radio > this.radio && this.tiempoDesdeUltimoDaño <= 0){
+            else if(npcActual.radio > this.radio && this.tiempoDesdeUltimoDaño <= 0){
                 this.juego.perderVida();
                 this.tiempoDesdeUltimoDaño = 1000;
-            }*/
+            }
         }
     }
 
@@ -185,35 +179,20 @@ class SlimeProta extends Entidad{
         if(this.sprite == null) return;
 
         let crecimiento = comida.radio / this.radio;
-        
-        // Aumentar los puntos si es una larva en el nivel 2
-/*         if(this.juego.nivelActual === 2 && comida.constructor.name === 'Larva') {
-            this.juego.agregarPuntos(5); // Dar 5 puntos por cada larva en nivel 2
-        } else {
-            this.juego.agregarPuntos(1); // Puntos normales para otros casos
-        } */
-
-        // Aumentar velocidad si come un pez en el nivel 3
-        if(this.juego.nivelActual === 3 && comida.constructor.name === 'Pez') {
-            this.MultiplicadorDeAceleracion *= 1.2; // Aumentar la aceleración en 20%
-            this.velocidadMax *= 1.2; // Aumentar la velocidad máxima en 20%
-        }
 
         this.radio += crecimiento * 10;
+
         this.sprite.setSize(this.radio * this.scaleOffset);
 
         this.juego.agregarPuntos(1);
 
-        console.log(comida);
-
         this.juego.npcManager.eliminarEntidad(comida);
-
-        
 
         if(this.radio >= this.juego.radioNivelActual){
             console.log("radio: "+this.radio+" radioNivelActual: "+this.juego.radioNivelActual);
             this.juego.subirNivel();
         }
+
         this.juego.hud.actualizarDebug("crecimiento: " + crecimiento);
     }
 }

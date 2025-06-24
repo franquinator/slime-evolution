@@ -165,19 +165,21 @@ class Juego {
   }
 
   perderVida() {
-/*     this.vidas--;
+    this.vidas--;
     this.hud.actualizarVidas(this.vidas);
     if (this.vidas <= 0) {
       alert("¡Perdiste! (Presiona 'R' para reiniciar)");
       this.finalizado = true;
       this.app.stop();
-    } */
+    }
   }
+
   subirNivel() {
     this.nivelActual++;
     console.log("subiendo nivel"+this.nivelActual);
     if(this.nivelActual == 2){
-      this.cargarNivel2();
+      this.finalizarJuego(true);
+      //this.cargarNivel2();
     }
     else if (this.nivelActual == 3) {
       this.cargarNivel3();
@@ -188,7 +190,6 @@ class Juego {
       this.app.stop();
     }
     this.radioNivelActual = this.radioNivel[this.nivelActual-1];
-
   }
 
   //funciones para cambiar de nivel
@@ -197,6 +198,7 @@ class Juego {
     this.npcManager.ponerNpcsEnTodoElMapa(Virus, 10);
     this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 3000);
   }
+
   cargarNivel2() {
     console.log("cargando nivel 2");
     const cantidadLarvas = this.dificultad === 'facil' ? 15 : this.dificultad === 'normal' ? 20 : 25;
@@ -207,6 +209,7 @@ class Juego {
     this.ampliarMapa();
     this.npcManager.sacarNpcs(Ameba);
   }
+
   cargarNivel3() {
     console.log("Cargando nivel 3");
     const cantidadPeces = this.dificultad === 'facil' ? 7 : this.dificultad === 'normal' ? 10 : 15;
@@ -217,6 +220,7 @@ class Juego {
     this.ampliarMapa();
     this.npcManager.sacarNpcs(Virus);
   }
+
   ampliarMapa() {
     this.fondo.ampliar(3);
   }
@@ -225,7 +229,8 @@ class Juego {
     if (this.nivelActual === 2) {
       // En el nivel 2, pasar al siguiente nivel al alcanzar 650 puntos
       if (this.puntos >= 650) {
-        this.subirNivel();
+        this.finalizarJuego(true);
+        //this.subirNivel();
       }
     } else if (this.nivelActual === 3) {
       // En el nivel 3, verificar si quedan peces

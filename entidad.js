@@ -1,17 +1,17 @@
-class Entidad{
-    constructor(posX,posY,radio,juego){
-        verificarValor(posX,"posX");
-        verificarValor(posY,"posY");
-        verificarValor(radio,"radio");
-        verificarValor(juego,"juego");
+class Entidad {
+    constructor(posX, posY, radio, juego) {
+        verificarValor(posX, "posX");
+        verificarValor(posY, "posY");
+        verificarValor(radio, "radio");
+        verificarValor(juego, "juego");
 
-        this.position = {x:posX, y:posY};
+        this.position = { x: posX, y: posY };
 
-        this.radio = radio; 
+        this.radio = radio;
         this.juego = juego;
 
-        this.vel = {x:0, y:0};
-        this.aceleracion = {x:0, y:0};
+        this.vel = { x: 0, y: 0 };
+        this.aceleracion = { x: 0, y: 0 };
 
         this.velocidadMax = 1;
         this.MultiplicadorDeAceleracion = 0.1;
@@ -20,50 +20,53 @@ class Entidad{
         this.container = new PIXI.Container();
         this.fuiEliminado = false;
     }
-    async MostrarCollider(){
+
+    async MostrarCollider() {
         const collider = new PIXI.Graphics()
-        .circle(0, 0, this.radio)
-        .stroke({
-            width: 1,
-            color: 0x00ff00
-        });
+            .circle(0, 0, this.radio)
+            .stroke({
+                width: 1,
+                color: 0x00ff00
+            });
         collider.zIndex = 12;
         collider.name = "collider";
         this.container.addChild(collider);
     }
-    async cargarSprite(ruta,escalaExtra){
+
+    async cargarSprite(ruta, escalaExtra) {
         let textura = await PIXI.Assets.load(ruta);
 
         this.sprite = new PIXI.Sprite(textura);
         this.sprite.setSize(this.radio * 2 + escalaExtra);
-        this.sprite.anchor.set(0.5,0.5);
+        this.sprite.anchor.set(0.5, 0.5);
 
         this.container.addChild(this.sprite);
         this.container.zIndex = 11;
 
         this.juego.worldContainer.addChild(this.container);
-         
     }
-    cargarSprite2(nombre,escalaExtra){
+
+    cargarSprite2(nombre, escalaExtra) {
         let textura = this.juego.recursos.get(nombre);
-        
+
         this.sprite = new PIXI.Sprite(textura);
         this.sprite.setSize(this.radio * 2 + escalaExtra);
-        this.sprite.anchor.set(0.5,0.5);
+        this.sprite.anchor.set(0.5, 0.5);
 
         this.container.addChild(this.sprite);
         this.container.zIndex = 11;
 
         this.juego.worldContainer.addChild(this.container);
     }
-    update(){
+    
+    update() {
         this.aplicarAceleracion();
         this.aplicarFriccion();
         this.aplicarVelocidad();
         this.actualizarMiPosicionEnLaGrilla();
     }
-    
-    asignarVelocidad(x,y){
+
+    asignarVelocidad(x, y) {
         if (isNaN(x) || isNaN(y)) {
             throw new Error("Velocidad NaN detectada");
         }
@@ -71,7 +74,7 @@ class Entidad{
         this.vel.y = y;
     }
 
-    asignarAceleracion(x,y){
+    asignarAceleracion(x, y) {
         if (isNaN(x) || isNaN(y)) {
             throw new Error("Aceleración NaN detectada");
         }
@@ -79,7 +82,7 @@ class Entidad{
         this.aceleracion.y = y;
     }
 
-    asignarAceleracionNormalizada(x,y){
+    asignarAceleracionNormalizada(x, y) {
         if (isNaN(x) || isNaN(y)) {
             throw new Error("Aceleración NaN detectada");
         }
@@ -88,7 +91,7 @@ class Entidad{
         this.aceleracion.y = aceleracionNormalizada.y * this.MultiplicadorDeAceleracion;
     }
 
-    asignarVelocidadNormalizada(x,y){
+    asignarVelocidadNormalizada(x, y) {
         if (isNaN(x) || isNaN(y)) {
             throw new Error("Velocidad NaN detectada");
         }
@@ -97,65 +100,57 @@ class Entidad{
         this.vel.y = velocidadNormalizada.y;
     }
 
-    aplicarAceleracion(){
-        if(velocidadLinear(this.vel.x,this.vel.y) < this.velocidadMax){
+    aplicarAceleracion() {
+        if (velocidadLinear(this.vel.x, this.vel.y) < this.velocidadMax) {
             this.vel.x += this.aceleracion.x;
             this.vel.y += this.aceleracion.y;
         }
     }
+
     aplicarVelocidad() {
         const delta = this.juego.delta;
-
         this.position.x += this.vel.x * delta;
         this.position.y += this.vel.y * delta;
-
-
-        //console.log("pos: "+this.position," vel",this.vel," delta",delta," posicionDeFondo",posicionDeFondo," tamañoJuego",tamañoJuego);
-        /* this.position.x = clamp(this.position.x + this.vel.x * delta, this.getLimites().limX.min, this.getLimites().limX.max);
-        this.position.y = clamp(this.position.y + this.vel.y * delta, this.getLimites().limY.min, this.getLimites().limY.max); */
-/* 
-        if(this.position.x == undefined){
-            debugger;
-        }
-        if(!this.position.y){
-            debugger;
-        } */
     }
-    irA(x,y){
+
+    irA(x, y) {
         this.position.x = x;
         this.position.y = y;
     }
-    frenar(){
+
+    frenar() {
         this.vel.x = 0;
         this.vel.y = 0;
         this.aceleracion.x = 0;
         this.aceleracion.y = 0;
     }
-    aplicarFriccion(){
+
+    aplicarFriccion() {
         this.vel.x *= this.friccion;
         this.vel.y *= this.friccion;
     }
+
     actualizarMiPosicionEnLaGrilla() {
         const celdaActual = this.juego.grilla.obtenerCeldaEnPosicion(
             this.position.x,
             this.position.y
         );
-
         if (this.celda && celdaActual && celdaActual != this.celda) {
             this.celda.sacame(this);
             celdaActual.agregame(this);
             this.celda = celdaActual;
         } else if (!this.celda && celdaActual) {
-            //console.log("agregando entidad a celda", celdaActual,"position",this.position);
             celdaActual.agregame(this);
             this.celda = celdaActual;
         }
     }
-    render(){
+
+    render() {
         this.container.x = this.position.x;
         this.container.y = this.position.y;
     }
-    destroy(){
+    
+    destroy() {
         this.celda.sacame(this);
         this.fuiEliminado = true;
         this.container.destroy();

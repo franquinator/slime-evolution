@@ -73,6 +73,7 @@ class Hud {
             this.juego.slime.alternarColisiones();
         });
     }
+    
     dibujarBarraDeTurbo(){
         const alto = 20
         const ancho = window.innerWidth / 2;
@@ -98,6 +99,7 @@ class Hud {
         this.barraDeTurbo.fondo = fondo;
         this.barraDeTurbo.anchoMaximo = ancho;
     }
+
     setBarraTurbo(porcentaje){
         let porcentaLimitado = clamp(porcentaje,0,100)
         this.barraDeTurbo.graficos.width = this.barraDeTurbo.anchoMaximo * porcentaLimitado / 100;

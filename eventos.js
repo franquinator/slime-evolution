@@ -41,13 +41,12 @@ class Eventos{
             this.juego.hud.togglePanelDebug();
         }
     }
+
     cuandoSePresionaElMouse(evento) {
-        // Por ejemplo, marcar que el mouse está presionado
         this.juego.mousePresionado = true;
     }
 
     cuandoSeSueltaElMouse(evento) {
-        // Marcar que el mouse ya no está presionado
         this.juego.mousePresionado = false;
     }
 }
