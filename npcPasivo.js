@@ -5,7 +5,7 @@ class NpcPasivo extends Npc {
         this.aceleracion = { x: 0, y: 0 };
         this.velocidadMax = 10;
         this.maxForce = 0.2;
-        this.npcsA50Mts = [];
+        this.npcsA100Mts = [];
         this.celda = null;
         this.juego.grilla.añadirNpcEnGrilla(this);
     }
@@ -117,9 +117,9 @@ class NpcPasivo extends Npc {
         //se puede ver a esto como motivaciones
         //motivacion para alinearse juntarse y separarse
 
-        let alignment = this.align(this.npcsA50Mts);
-        let cohesion = this.cohesion(this.npcsA50Mts);
-        let separation = this.separation(this.npcsA50Mts,50);
+        let alignment = this.align(this.npcsA100Mts);
+        let cohesion = this.cohesion(this.npcsA100Mts);
+        let separation = this.separation(this.npcsA100Mts,50);
         let escape = this.escape(this.juego.slime);
         let separacionDeGrandes = this.separation(this.npcsMalosParaMiA50mts,400);
 
@@ -139,14 +139,13 @@ class NpcPasivo extends Npc {
     recopilarDatos(){
         const distBusqueda = 100;
         
-        this.npcsA50Mts = [];
-        let celdasA100Mts = this.juego.grilla.obtenerCeldasADistancia(distBusqueda,this.position.x,this.position.y)
-        for(let celda of celdasA100Mts){
-            for(let npc of celda.entidadesAca){
-                let d = distancia(this.position, npc.position);
-                if(npc != this && d < distBusqueda){
-                        this.npcsA50Mts.push({Npc:npc,Dist:d});
-                }
+        this.npcsA100Mts = [];
+        let npcsEnCeldasA100Mts = this.juego.grilla.obtenerNpsADistancia(distBusqueda,this)
+        
+        for(let npc of npcsEnCeldasA100Mts){
+            let d = distancia(this.position, npc.position);
+            if(npc != this && d < distBusqueda){
+                    this.npcsA100Mts.push({Npc:npc,Dist:d});
             }
         }
 

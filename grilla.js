@@ -83,15 +83,26 @@ class Grilla {
         return(dist);
     }
     obtenerNpsADistancia(distancia,npcIn){
+        let celdasCercanas = this.obtenerCeldasADistancia(distancia,npcIn.position.x,npcIn.position.y);
         let nps = [];
-        for(let celda of this.celdas){
-            for(let npc of celda.entidadesAca){
-                if(npc != npc && distancia(npcIn.position, npc.position) < distancia){
-                    nps.push(npc);
-                }
-            }   
+        for(let celda of celdasCercanas){
+            nps.concat(celda.entidadesAca)
         }
         return nps;
+    }
+    obtenerColisionesCon(entidad){
+        
+        let npcs = [];
+        let celdasCercanas = this.obtenerCeldasADistancia(entidad.radio * 2,entidad.position.x,entidad.position.y);
+        for(let celda of celdasCercanas){
+            for(let npc of celda.entidadesAca){
+                if(npc != entidad  && distancia(npc.position,entidad.position) < npc.radio + entidad.radio){
+                    npcs.push(npc);
+                }
+            }
+        }
+        
+        return npcs;
     }
     test(){
         //al estar en 0 0 con distancia de 200 solo devuelve 1 celda

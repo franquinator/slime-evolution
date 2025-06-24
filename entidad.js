@@ -18,6 +18,7 @@ class Entidad{
         this.friccion = 0.90;
 
         this.container = new PIXI.Container();
+        this.fuiEliminado = false;
     }
     async MostrarCollider(){
         const collider = new PIXI.Graphics()
@@ -155,6 +156,8 @@ class Entidad{
         this.container.y = this.position.y;
     }
     destroy(){
+        this.celda.sacame(this);
+        this.fuiEliminado = true;
         this.container.destroy();
     }
 }

@@ -163,12 +163,12 @@ class SlimeProta extends Entidad{
     verificarColisiones(){
         //const colisiones = this.juego.obtenerEntidadesCercanasSinOptimizar(this,this.radio);
         //const colisiones = this.juego.obtenerEntidadesCercanasQuadtree(this,this.radio);
-        const colisiones = this.juego.npcManager.obtenerEntidadesCercanasSinOptimizar(this, this.radio);
+        const colisiones = this.juego.grilla.obtenerColisionesCon(this);
         //const posiblesColisiones = this.juego.quadtree.recuperar(this);
-
+        //console.log(colisiones)
         for (let i = 0; i < colisiones.length; i++) {
             const npcActual = colisiones[i];
-            if(npcActual.radio <= this.radio){
+            if(npcActual.radio <= this.radio && !npcActual.fuiEliminado){
                 this.comer(npcActual);
 /*                 if(this.juego.todasLasEntidades.length == 0){
                     alert("Ganaste (Presiona 'F5' para reiniciar)");
@@ -187,11 +187,11 @@ class SlimeProta extends Entidad{
         let crecimiento = comida.radio / this.radio;
         
         // Aumentar los puntos si es una larva en el nivel 2
-        if(this.juego.nivelActual === 2 && comida.constructor.name === 'Larva') {
+/*         if(this.juego.nivelActual === 2 && comida.constructor.name === 'Larva') {
             this.juego.agregarPuntos(5); // Dar 5 puntos por cada larva en nivel 2
         } else {
             this.juego.agregarPuntos(1); // Puntos normales para otros casos
-        }
+        } */
 
         // Aumentar velocidad si come un pez en el nivel 3
         if(this.juego.nivelActual === 3 && comida.constructor.name === 'Pez') {
@@ -204,7 +204,11 @@ class SlimeProta extends Entidad{
 
         this.juego.agregarPuntos(1);
 
+        console.log(comida);
+
         this.juego.npcManager.eliminarEntidad(comida);
+
+        
 
         if(this.radio >= this.juego.radioNivelActual){
             console.log("radio: "+this.radio+" radioNivelActual: "+this.juego.radioNivelActual);
