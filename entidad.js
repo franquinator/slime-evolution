@@ -21,6 +21,7 @@ class Entidad {
 
         this.container = new PIXI.Container();
         this.fuiEliminado = false;
+        //this.MostrarCollider();
     }
 
     async MostrarCollider() {

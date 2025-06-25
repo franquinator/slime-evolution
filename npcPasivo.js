@@ -77,8 +77,8 @@ class NpcPasivo extends Npc {
         return steering;
     }
     
-    escape(slime){
-        let perceptionRadius = 400;
+    escape(slime,radio){
+        let perceptionRadius = radio;
         let steering = { x: 0, y: 0 };
         let d = distancia(this.position, slime.position);
         if(d < perceptionRadius + slime.radio){
@@ -90,29 +90,61 @@ class NpcPasivo extends Npc {
         }
         return steering;
     }
+    persecucion(slime,radio){
+        let perceptionRadius = radio;
+        let steering = { x: 0, y: 0 };
+        let d = distancia(this.position, slime.position);
+        if(d < perceptionRadius + slime.radio){
+            //console.log("slime cerca");
+            let direccionDeHuida = getUnitVector(slime.position,this.position);
+            //console.log(direccionDeHuida);
+            steering = vectorSuma(steering, direccionDeHuida);
+        }
+        return steering;
+    }
 
-    flock(boids) {
+    comportamiento() {
         //se puede ver a esto como motivaciones
         //motivacion para alinearse juntarse y separarse
 
-        let alignment = this.align(this.npcsA100Mts);
-        let cohesion = this.cohesion(this.npcsA100Mts);
-        let separation = this.separation(this.npcsA100Mts,50);
-        let escape = this.escape(this.juego.slime);
-        let separacionDeGrandes = this.separation(this.npcsMalosParaMiA50mts,400);
-
-        alignment = vectorMultiplicacion(alignment, 1.5);
-        cohesion = vectorMultiplicacion(cohesion, 0.5);
-        separation = vectorMultiplicacion(separation, 2);
-        escape = vectorMultiplicacion(escape, 1);
-        separacionDeGrandes = vectorMultiplicacion(separacionDeGrandes, 4);
+        this.aplicarAlineacion(this.npcsA100Mts,1.5);
+        this.aplicarCohesion(this.npcsA100Mts,0.5);
+        this.aplicarSeparacion(this.npcsA100Mts,2,50);
+        this.aplicarSeparacion(this.npcsMalosParaMiA50mts,4,400);
 
 
+        if(this.radio > this.juego.slime.radio){
+            this.aplicarPersecucion(this.juego.slime,.5,600)
+        }
+        else{
+            this.aplicarEscape(this.juego.slime,2,400)
+        }
+    }
+
+    aplicarAlineacion(boids,potencia){
+        let alignment = this.align(boids);
+        alignment = vectorMultiplicacion(alignment, potencia);
         this.aceleracion = vectorSuma(this.aceleracion, alignment);
+    }
+    aplicarCohesion(boids,potencia){
+        let cohesion = this.cohesion(boids);
+        cohesion = vectorMultiplicacion(cohesion, potencia);
         this.aceleracion = vectorSuma(this.aceleracion, cohesion);
+    }
+    aplicarSeparacion(boids,potencia,radio){
+        let separation = this.separation(boids,radio);
+        separation = vectorMultiplicacion(separation, potencia);
         this.aceleracion = vectorSuma(this.aceleracion, separation);
+    }
+    aplicarEscape(unBoid,potencia,radio){
+        let escape = this.escape(unBoid,radio);
+        escape = vectorMultiplicacion(escape, potencia);
         this.aceleracion = vectorSuma(this.aceleracion, escape);
-        this.aceleracion = vectorSuma(this.aceleracion, separacionDeGrandes);
+    }
+    aplicarPersecucion(unBoid,potencia,radio){
+        let persecucion = this.persecucion(unBoid,radio);
+        persecucion = vectorMultiplicacion(persecucion, potencia);
+        this.aceleracion = vectorSuma(this.aceleracion, persecucion);
     }
 
     recopilarDatos(){
@@ -150,7 +182,7 @@ class NpcPasivo extends Npc {
     update() {
         this.actualizarPosicionEnGrilla();  
         this.recopilarDatos();
-        this.flock(this.juego.npcManager.todasLasEntidades);
+        this.comportamiento();
         this.subUpdate();
         this.edges();
     }
@@ -160,6 +192,5 @@ class NpcPasivo extends Npc {
     }
     dividir(veces){
         super.dividir(veces);
-        this.velocidadMax /= veces;
     }
 }

@@ -121,7 +121,6 @@ class Camara {
     }
     hacerZoom(veces){
         this.juego.worldContainer.scale.set(this.escala*veces);
-        this.escala /= veces;
     }
     sacarZoom(){
         this.juego.worldContainer.scale.set(1,1);

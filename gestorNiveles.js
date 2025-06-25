@@ -1,69 +1,38 @@
 class GestorNiveles{
     constructor(juego) {
         this.juego = juego;
-        this.nivelActual = 1;
-        this.radioNivel = [100,1300,2400];
+        this.nivelActual = -1;
+        let cantEnemigos = this.dificultad === 'facil' ? 10 : this.dificultad === 'normal' ? 20 : 30;
+        this.cantEnemigos = cantEnemigos;
+        this.niveles = []
+        this.radioActual = -1;
+
+        this.niveles.push(new Nivel([Larva,Virus],[cantEnemigos,4000],["Ameba"],5,1000,this.juego));
+        this.niveles.push(new Nivel([Pez,Larva],[cantEnemigos,4000],["Virus"],5,3000,this.juego));
     }
     radioNivelActual(){
-        return 200;
+        return this.radioActual / this.juego.escalaDeJuego;
+
     }
     subirNivel(){
-        if(this.nivelActual > 1) return;
-        //hachica todo 5 veces
-        //divide las distancias en 5
-
-        //hacer que los virus midan 20
-        let entidades = this.juego.npcManager.obtenerTodasLasEntidades();
-        for(let entidad of entidades){
-            entidad.dividir(2);
-        }
-        this.juego.slime.dividir(2);
-
-        this.juego.npcManager.sacarNpcs("Ameba");
-
-        this.juego.camara.hacerZoom(1.5);
-
-        this.juego.escalaDeJuego = 2;
-
-        this.juego.fondo.sprite.tileScale = 0.5;
-
-        this.juego.npcManager.ponerNpcsEnTodoElMapa(Virus, 2000);
-        this.juego.npcManager.ponerNpcsEnTodoElMapa(Larva, 10);
-        //y el protagonista tambien
-        //la camara hace cosas raras
         this.nivelActual++;
-
+        if(this.nivelActual < this.niveles.length){
+            this.cargarNivel(this.nivelActual);
+        }
+        else{
+            this.juego.finalizarJuego(true);
+        }
+        console.log("nivel subido")
+        
     }
-    cargarNivel0(){
-        this.juego.npcManager.ponerNpcsEnTodoElMapa(Ameba, 4000);
-        this.juego.npcManager.ponerNpcsEnTodoElMapa(Virus, 10);
-    } 
-    cargarNivel1(){
-
-    } 
-    /*  cargarNivel2() {
-    console.log("cargando nivel 2");
-    const cantidadLarvas = this.dificultad === 'facil' ? 15 : this.dificultad === 'normal' ? 20 : 25;
-    const cantidadVirus = this.dificultad === 'facil' ? 800 : this.dificultad === 'normal' ? 1000 : 1200;
-    
-    this.npcManager.agregarNpcsEnZonaNoVisible(Larva, cantidadLarvas);
-    this.npcManager.agregarNpcsEnZonaNoVisible(Virus, cantidadVirus);
-    this.ampliarMapa();
-    this.npcManager.sacarNpcs(Ameba);
-  }
-
-  cargarNivel3() {
-    console.log("Cargando nivel 3");
-    const cantidadPeces = this.dificultad === 'facil' ? 7 : this.dificultad === 'normal' ? 10 : 15;
-    const cantidadLarvas = this.dificultad === 'facil' ? 400 : this.dificultad === 'normal' ? 500 : 600;
-    
-    this.npcManager.agregarNpcsEnZonaNoVisible(Pez, cantidadPeces);
-    this.npcManager.agregarNpcsEnZonaNoVisible(Larva, cantidadLarvas);
-    this.ampliarMapa();
-    this.npcManager.sacarNpcs(Virus);
-  }
-
-  ampliarMapa() {
-    this.fondo.ampliar(3);
-  }*/
+    cargarNivel(numNivel){
+        console.log("nivel cargado");
+        this.niveles[numNivel].jugar();
+        this.radioActual = this.niveles[numNivel].tamañoParaProxNivel;
+    }
+    iniciar(){
+        this.radioActual = 200;
+        this.juego.npcManager.ponerNpcsEnTodoElMapa(Virus,this.cantEnemigos)
+        this.juego.npcManager.ponerNpcsEnTodoElMapa(Ameba,4000)
+    }
 }

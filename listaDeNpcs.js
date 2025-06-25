@@ -6,7 +6,7 @@ class Ameba extends NpcPasivo{
 
         let probabilidadDeSprite = Math.random();
         if(probabilidadDeSprite < 0.5){
-            this.cargarSprite2("Assets/Graficos/amoeba1.png",1);
+            this.cargarSprite2("Assets/Graficos/ameba agua.png",1);
         }
         else{
             this.cargarSprite2("Assets/Graficos/amoeba2.png",1);
@@ -17,22 +17,22 @@ class Ameba extends NpcPasivo{
 class Virus extends NpcPasivo{
     constructor(posX,posY,juego){
         super(posX,posY,100,juego,2,"Larva");
-        this.cargarSprite2("Assets/Graficos/bacteria1.png",2);
+        this.cargarSprite2("Assets/Graficos/virusPixel.png",2);
         //this.MostrarCollider();
     }
 }
 class Larva extends NpcPasivo{
     constructor(posX,posY,juego){
-        super(posX,posY,600,juego,1,"Pez");
+        super(posX,posY,500,juego,1,"Pez");
         this.cargarSprite("Assets/Graficos/larva.png",2);
         //this.MostrarCollider();
     }
 }
-class Pez extends NpcAgresivo{
+class Pez extends NpcPasivo{
     constructor(posX,posY,juego){
-        super(posX,posY,2000,juego,600,0.8);
-        this.cargarSprite("Assets/Graficos/pezPixel.png",500);
-        this.tiempoDesdeUltimoAtaque = 0;
+        super(posX,posY,2500,juego,1,"nadie");
+        this.cargarSprite("Assets/Graficos/pezPixel.png",1.5);}
+/*         this.tiempoDesdeUltimoAtaque = 0;
         this.intervaloAtaque = 1000;
         this.territorio = {
             x: posX,
@@ -55,7 +55,7 @@ class Pez extends NpcAgresivo{
         } else {
             super.update();
         }
-    }
+    } */
 }
 class Gato extends NpcAgresivo {
     constructor(posX, posY, juego) {

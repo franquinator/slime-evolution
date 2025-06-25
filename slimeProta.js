@@ -18,6 +18,7 @@ class SlimeProta extends Entidad{
         this.velNormal = 1;
 
         this.multDeVelocidad = 1;
+        this.colisionesActivas = true;
         this.MostrarCollider();
     }
 

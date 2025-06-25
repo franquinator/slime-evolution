@@ -78,7 +78,7 @@ class Juego {
     this.slime = new SlimeProta(1500, 1500, 20, this);
     await this.slime.inicializar();
 
-    this.gestorNiveles.cargarNivel0();
+    this.gestorNiveles.iniciar();
 
     //agrega elementos de PIXI
     window.__PIXI_APP__ = this.app;
