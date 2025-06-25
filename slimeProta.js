@@ -3,7 +3,7 @@ class SlimeProta extends Entidad{
         super(posX,posY,radio,juego);
         this.tiempoDesdeUltimoDaño = 0;
 
-        this.scaleOffset = 8;
+        this.scaleOffset = 4;
         this.animacionActual = null;
 
         this.turboMax = 1000;
@@ -34,7 +34,7 @@ class SlimeProta extends Entidad{
         this.sprite.animationSpeed = 0.15;
         this.sprite.play();
         this.sprite.anchor.set(0.43,0.56);
-        this.sprite.setSize(this.radio * this.scaleOffset);
+        this.sprite.setSize(this.radio * 2 * this.scaleOffset);
         this.container.zIndex = 12;
 
         this.container.name = "jugador";
@@ -147,7 +147,7 @@ class SlimeProta extends Entidad{
         this.position.x += this.vel.x * delta * this.multDeVelocidad;
         this.position.y += this.vel.y * delta * this.multDeVelocidad;
     }
-    
+
     posicionEnPantalla(){
         const posicion = this.juego.worldContainer.toGlobal(this.position);
         return {
@@ -177,22 +177,42 @@ class SlimeProta extends Entidad{
 
     comer(comida){
         if(this.sprite == null) return;
+        
+        /*
+            si mide mas de 75% sube la cantidad de su masa;
+            si mide mas del 50% sube la cantidad de su masa dividido 2;
+            si mide mas del 25% sube la cantidad de su masa dividido 4;
+            si mide menos del 25% sube la cantidad de su masa dividido 8
+        */
+        let escala = 10;
+        let porcentaje = comida.radio * 100 / this.radio;
 
-        let crecimiento = comida.radio / this.radio;
-
-        this.radio += crecimiento * 10;
-
-        this.sprite.setSize(this.radio * this.scaleOffset);
+        let crecimiento = interpolacionLineal(0,comida.radio,porcentaje / 100) / escala;
+        this.crecer(crecimiento);
 
         this.juego.agregarPuntos(1);
 
-        this.juego.npcManager.eliminarEntidad(comida);
-
-        if(this.radio >= this.juego.radioNivelActual){
-            console.log("radio: "+this.radio+" radioNivelActual: "+this.juego.radioNivelActual);
-            this.juego.subirNivel();
-        }
+        comida.destroy();
 
         this.juego.hud.actualizarDebug("crecimiento: " + crecimiento);
+    }
+    crecer(cantidad){
+        this.radio += cantidad;
+
+        this.sprite.setSize(this.radio * 2 * this.scaleOffset);
+        this.collider.setSize(this.radio * 2);
+
+        if(this.radio >= this.juego.gestorNiveles.radioNivelActual()){
+            this.juego.gestorNiveles.subirNivel();
+        }
+    }
+    dividir(veces){
+        this.position.x /= veces;
+        this.position.y /= veces;
+
+        this.radio /= veces;
+        this.sprite.setSize(this.radio * 2 * this.scaleOffset);
+        this.collider.setSize(this.radio * 2)
+
     }
 }

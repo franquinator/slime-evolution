@@ -86,6 +86,13 @@ class Grilla {
         }
         return nps;
     }
+    obtenerTodasLasEntidades() {
+        let npcs = [];
+        for (let celda of Object.values(this.celdas)) {
+            npcs = npcs.concat(celda.entidadesAca);
+        }
+        return npcs;    
+    }
 
     obtenerColisionesCon(entidad) {
         let npcs = [];

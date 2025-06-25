@@ -3,7 +3,7 @@ class NpcManager {
         this.juego = juego;
         this.todasLasEntidades = new Map();
     }
-    
+
     update() {
         for (let grupoEntidades of this.todasLasEntidades) {
             this.actualizarGrupoDeEntidades(grupoEntidades[1]);
@@ -17,15 +17,26 @@ class NpcManager {
         }
     }
 
-    sacarNpcs(clase) {
-        console.log("npc sacados");
-        for (let i = 0; i < this.todasLasEntidades.length; i++) {
-            if (this.todasLasEntidades[i] instanceof clase) {
-                this.eliminarEntidadEn(i);
-                i--;
-            }
+    obtenerGrupoDeEntidades(nombreGrupo){
+        if(!this.todasLasEntidades.has(nombreGrupo)){return []}
+        return this.todasLasEntidades.get(nombreGrupo);
+    }
+    obtenerTodasLasEntidades(){
+        let npcs = [];
+        for (let grupo of this.todasLasEntidades) {
+            npcs = npcs.concat(this.todasLasEntidades.get(grupo[0]));
         }
-        console.log(this.todasLasEntidades);
+        return npcs;
+    }
+
+    sacarNpcs(clase) {
+        let repeticiones = 0;
+        let grupoEntidades = this.obtenerGrupoDeEntidades(clase);
+        for (let i = 0; i < grupoEntidades.length; i++) {
+            grupoEntidades[i].destroy();
+            i--;
+        }
+        this.todasLasEntidades.delete(clase);
     }
 
     ponerNpcsEnTodoElMapa(clase, cantidad) {
@@ -87,33 +98,14 @@ class NpcManager {
         }
         return entidadesCercanas;
     }
-    obtenerEntidadesCercanasQuadtree(entidad, radio) {
-        return this.quadtree.entidadesCercanas(entidad, radio);
-    }
-    obtenerEntidadesCercanasSpatialHash(entidad, radio) {
-        return this.spatialHash.entidadesCercanas(entidad, radio);
-    }
-    actualizarQuadtree() {
-        this.quadtree.limpiar();
-        for (let entidad of this.todasLasEntidades) {
-            this.quadtree.insertar(entidad);
-        }
-    }
-    actualizarSpatialHash() {
-        this.spatialHash.limpiar();
-        for (const entidad of this.todasLasEntidades) {
-            this.spatialHash.actualizarPosicion(entidad);
-        }
-    }
     hayNpcs() {
         return this.todasLasEntidades.length > 0;
     }
     eliminarEntidad(entidad) {
         const clase = entidad.constructor.name
+        if(!this.todasLasEntidades.has(clase)) return;
         const index = this.todasLasEntidades.get(clase).indexOf(entidad);
         this.todasLasEntidades.get(clase).splice(index, 1);
-        this.juego.app.stage.removeChild(entidad);
-        entidad.destroy();
     }
     eliminarEntidadEn(index) {
         let entidad = this.todasLasEntidades[index];

@@ -3,18 +3,22 @@ class Camara {
         this.juego = juego;
         // Inicializar la escala del contenedor con un valor inicial apropiado
         this.juego.worldContainer.scale.set(0.8, 0.8);
-        this.escalaMinima = 0.2;  // Valor base para nivel 1
+        this.escalaMinima = 1;  // Valor base para nivel 1
         this.escalaMaxima = 1.5;
         this.factorSuavizado = 0.1;
+
+        this.factorSuavizadoescala = 0.1;
+        this.escala = 0.5;
     }
 
     inicializar() {
         this.juego.app.stage.addChild(this.juego.worldContainer);
+        this.ajustarTamanio(this.escala);
     }
 
     actualizar() {
+        
         const { worldContainer, slime, fondo } = this.juego;
-
         if (!slime || !fondo) {
             console.warn('No se puede actualizar la cámara: slime o fondo no están definidos');
             return;
@@ -47,12 +51,8 @@ class Camara {
         targetX = Math.max(limitesCamara.minX, Math.min(limitesCamara.maxX, targetX));
         targetY = Math.max(limitesCamara.minY, Math.min(limitesCamara.maxY, targetY));
 
-        // Aplicar suavizado al movimiento
-        const deltaX = targetX - worldContainer.x;
-        const deltaY = targetY - worldContainer.y;
-
-        worldContainer.x += deltaX * this.factorSuavizado;
-        worldContainer.y += deltaY * this.factorSuavizado;
+        worldContainer.x = interpolacionLineal(worldContainer.x,targetX,this.factorSuavizado);
+        worldContainer.y = interpolacionLineal(worldContainer.y,targetY,this.factorSuavizado);
 
         // Validación de valores numéricos
         if (isNaN(worldContainer.x) || isNaN(worldContainer.y)) {
@@ -65,6 +65,16 @@ class Camara {
             worldContainer.x = worldContainer.x || 0;
             worldContainer.y = worldContainer.y || 0;
         }
+        this.hacerZoomLento(worldContainer);
+    }
+    enfocarEn(x,y){
+        console.log(this.juego.worldContainer.x);
+        this.juego.worldContainer.x = -x;
+        this.juego.worldContainer.y = -y;
+    }
+    hacerZoomLento(worldContainer){
+        let inicio = worldContainer.scale.x;
+        worldContainer.scale.set(interpolacionLineal(inicio,this.escala,this.factorSuavizadoescala));
     }
 
     actualizarLimitesZoom() {
@@ -83,7 +93,7 @@ class Camara {
 
     ajustarTamanio(tamanioDeAumento) {
         const worldContainer = this.juego.worldContainer;
-        const mouse = this.juego.mouse;
+        /* const mouse = this.juego.mouse;
     
         // Actualizar límites de zoom según el nivel
         this.actualizarLimitesZoom();
@@ -104,9 +114,16 @@ class Camara {
     
         // Ajustar la posición para mantener el punto del mouse fijo
         worldContainer.x = mouse.x - mouseX * nuevaEscalaX;
-        worldContainer.y = mouse.y - mouseY * nuevaEscalaY;
+        worldContainer.y = mouse.y - mouseY * nuevaEscalaY; */
     
         // Aplicar la nueva escala
-        worldContainer.scale.set(nuevaEscalaX, nuevaEscalaY);
+        worldContainer.scale.set(tamanioDeAumento, tamanioDeAumento);
+    }
+    hacerZoom(veces){
+        this.juego.worldContainer.scale.set(this.escala*veces);
+        this.escala /= veces;
+    }
+    sacarZoom(){
+        this.juego.worldContainer.scale.set(1,1);
     }
 }

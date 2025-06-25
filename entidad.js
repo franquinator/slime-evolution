@@ -1,5 +1,5 @@
 class Entidad {
-    constructor(posX, posY, radio, juego) {
+    constructor(posX, posY, radio, juego, valorNutricional) {
         verificarValor(posX, "posX");
         verificarValor(posY, "posY");
         verificarValor(radio, "radio");
@@ -7,7 +7,9 @@ class Entidad {
 
         this.position = { x: posX, y: posY };
 
-        this.radio = radio;
+        this.radio = radio / juego.escalaDeJuego;
+        this.valorNutricional = valorNutricional;
+        this.scaleOffset = 0;
         this.juego = juego;
 
         this.vel = { x: 0, y: 0 };
@@ -22,22 +24,23 @@ class Entidad {
     }
 
     async MostrarCollider() {
-        const collider = new PIXI.Graphics()
+        this.collider = new PIXI.Graphics()
             .circle(0, 0, this.radio)
             .stroke({
                 width: 1,
                 color: 0x00ff00
             });
-        collider.zIndex = 12;
-        collider.name = "collider";
-        this.container.addChild(collider);
+        this.collider.zIndex = 12;
+        this.collider.name = "collider";
+        this.container.addChild(this.collider);
     }
 
     async cargarSprite(ruta, escalaExtra) {
+        this.scaleOffset = escalaExtra;
         let textura = await PIXI.Assets.load(ruta);
 
         this.sprite = new PIXI.Sprite(textura);
-        this.sprite.setSize(this.radio * 2 + escalaExtra);
+        this.sprite.setSize(this.radio * 2 * escalaExtra);
         this.sprite.anchor.set(0.5, 0.5);
 
         this.container.addChild(this.sprite);
@@ -47,10 +50,11 @@ class Entidad {
     }
 
     cargarSprite2(nombre, escalaExtra) {
+        this.scaleOffset = escalaExtra;
         let textura = this.juego.recursos.get(nombre);
 
         this.sprite = new PIXI.Sprite(textura);
-        this.sprite.setSize(this.radio * 2 + escalaExtra);
+        this.sprite.setSize(this.radio * 2 * escalaExtra);
         this.sprite.anchor.set(0.5, 0.5);
 
         this.container.addChild(this.sprite);
@@ -58,12 +62,24 @@ class Entidad {
 
         this.juego.worldContainer.addChild(this.container);
     }
-    
+    dividir(veces){
+        this.position.x /= veces;
+        this.position.y /= veces;
+
+        this.radio /= veces;
+        this.sprite.setSize(this.radio * 2 * this.scaleOffset);
+    }
+
+    reescalar(nuevoRadio){
+        this.radio = nuevoRadio;
+        this.sprite.setSize(this.radio * 2 * this.scaleOffset);
+    }
+
     update() {
         this.aplicarAceleracion();
         this.aplicarFriccion();
         this.aplicarVelocidad();
-        this.actualizarMiPosicionEnLaGrilla();
+        //this.actualizarMiPosicionEnLaGrilla();
     }
 
     asignarVelocidad(x, y) {
@@ -130,7 +146,7 @@ class Entidad {
         this.vel.y *= this.friccion;
     }
 
-    actualizarMiPosicionEnLaGrilla() {
+/*     actualizarMiPosicionEnLaGrilla() {
         const celdaActual = this.juego.grilla.obtenerCeldaEnPosicion(
             this.position.x,
             this.position.y
@@ -143,7 +159,7 @@ class Entidad {
             celdaActual.agregame(this);
             this.celda = celdaActual;
         }
-    }
+    } */
 
     render() {
         this.container.x = this.position.x;
@@ -153,6 +169,8 @@ class Entidad {
     destroy() {
         this.celda.sacame(this);
         this.fuiEliminado = true;
+        this.juego.npcManager.eliminarEntidad(this);
         this.container.destroy();
+        this.juego.app.stage.removeChild(this);
     }
 }

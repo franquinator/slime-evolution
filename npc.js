@@ -1,8 +1,7 @@
 class Npc extends Entidad{
-    constructor(posX,posY,radio,juego,radioDeVision,velocidadMax){
+    constructor(posX,posY,radio,juego,velocidadMax){
         super(posX,posY,radio,juego);
         this.velocidadMax = velocidadMax;
-        this.radioDeEscape = radioDeVision;
         this.distanciaAlJugador = 0;
         this.tiempoQuieto = 0;
         this.ultimaPosicion = {x: posX, y: posY};

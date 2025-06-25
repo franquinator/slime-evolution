@@ -29,7 +29,7 @@ class Eventos{
     }
 
     cuandoSeGiraLaRueda(evento) {
-        this.juego.camara.ajustarTamanio(evento.deltaY / 1000);
+        //this.juego.camara.ajustarTamanio(evento.deltaY / 1000);
     }
 
     cuandoSePresionaUnaTecla(evento) {
@@ -39,6 +39,9 @@ class Eventos{
         }
         if (key === 'd') {
             this.juego.hud.togglePanelDebug();
+        }
+        if(key === '+'){
+            this.juego.slime.crecer(5)
         }
     }
 

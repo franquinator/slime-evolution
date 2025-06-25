@@ -16,7 +16,7 @@ class Celda {
 
   sacame(quien) {
     if (!quien) return;
-    for (let i = 0; i < this.entidadesAca.length; i++) {
+    for (let i = 0; i < this.entidadesAca.length; i++){
       const entidad = this.entidadesAca[i];
       if (quien == entidad) {
         this.entidadesAca.splice(i, 1);

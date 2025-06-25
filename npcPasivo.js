@@ -1,6 +1,6 @@
 class NpcPasivo extends Npc {
-    constructor(posX, posY, radio, juego, radioDeVision, velocidadMax) {
-        super(posX, posY, radio, juego, radioDeVision, velocidadMax);
+    constructor(posX, posY, radio, juego, velocidadMax,Enemigo) {
+        super(posX, posY, radio, juego, velocidadMax);
         this.vel = { x: Math.random() * 10 - 5, y: Math.random() * 10 - 5 };
         this.aceleracion = { x: 0, y: 0 };
         this.velocidadMax = 10;
@@ -8,6 +8,7 @@ class NpcPasivo extends Npc {
         this.npcsA100Mts = [];
         this.celda = null;
         this.juego.grilla.añadirNpcEnGrilla(this);
+        this.Enemigo = Enemigo;
     }
 
     edges() {
@@ -80,7 +81,7 @@ class NpcPasivo extends Npc {
         let perceptionRadius = 400;
         let steering = { x: 0, y: 0 };
         let d = distancia(this.position, slime.position);
-        if(d < perceptionRadius){
+        if(d < perceptionRadius + slime.radio){
             //console.log("slime cerca");
             let direccionDeHuida = getUnitVector(slime.position,this.position);
             direccionDeHuida = vectorMultiplicacion(direccionDeHuida, -1);
@@ -128,7 +129,7 @@ class NpcPasivo extends Npc {
         }
 
         this.npcsMalosParaMiA50mts = [];
-        for(let npc of this.juego.npcManager.todasLasEntidades.get("Virus")){
+        for(let npc of this.juego.npcManager.obtenerGrupoDeEntidades(this.Enemigo)){
             let d = distancia(this.position, npc.position);
             if(npc != this && d < 400){
                 this.npcsMalosParaMiA50mts.push({Npc:npc,Dist:d});
@@ -156,5 +157,9 @@ class NpcPasivo extends Npc {
 
     actualizarPosicionEnGrilla(){
         this.juego.grilla.actualizarNpcEnGrilla(this);
+    }
+    dividir(veces){
+        super.dividir(veces);
+        this.velocidadMax /= veces;
     }
 }

@@ -59,17 +59,6 @@ class Juego {
     });
   }
 
-  cargarPuntuacionAlta() {
-    return localStorage.getItem('puntuacionAlta') || 0;
-  }
-
-  guardarPuntuacionAlta() {
-    if (this.puntos > this.puntuacionAlta) {
-      this.puntuacionAlta = this.puntos;
-      localStorage.setItem('puntuacionAlta', this.puntuacionAlta);
-    }
-  }
-
   cargarDificultad() {
     return localStorage.getItem('dificultad') || 'normal';
   }
@@ -101,11 +90,6 @@ class Juego {
 
     //comienza el gameloop
     this.app.ticker.add(() => this.gameLoop());
-
-    //this.test();
-  }
-  test(){
-    this.grilla.test();
   }
   testearTiempo() {
     let tiempoInicial = performance.now();
@@ -163,6 +147,15 @@ class Juego {
     this.hud.actualizarPuntos(this.puntos);
     this.guardarPuntuacionAlta();
   }
+  cargarPuntuacionAlta() {
+    return localStorage.getItem('puntuacionAlta') || 0;
+  }
+  guardarPuntuacionAlta() {
+    if (this.puntos > this.puntuacionAlta) {
+      this.puntuacionAlta = this.puntos;
+      localStorage.setItem('puntuacionAlta', this.puntuacionAlta);
+    }
+  }
 
   perderVida() {
     this.vidas--;
@@ -171,77 +164,6 @@ class Juego {
       alert("¡Perdiste! (Presiona 'R' para reiniciar)");
       this.finalizado = true;
       this.app.stop();
-    }
-  }
-
-  subirNivel() {
-    this.nivelActual++;
-    console.log("subiendo nivel"+this.nivelActual);
-    if(this.nivelActual == 2){
-      this.finalizarJuego(true);
-      //this.cargarNivel2();
-    }
-    else if (this.nivelActual == 3) {
-      this.cargarNivel3();
-    }
-    else if(this.nivelActual >= 4){
-      alert("¡Ganaste! (Presiona 'R' para reiniciar)");
-      this.finalizado = true;
-      this.app.stop();
-    }
-    this.radioNivelActual = this.radioNivel[this.nivelActual-1];
-  }
-
-  //funciones para cambiar de nivel
-  cargarNivel1() {
-    console.log("cargando nivel 1");
-
-  }
-
-  cargarNivel2() {
-    console.log("cargando nivel 2");
-    const cantidadLarvas = this.dificultad === 'facil' ? 15 : this.dificultad === 'normal' ? 20 : 25;
-    const cantidadVirus = this.dificultad === 'facil' ? 800 : this.dificultad === 'normal' ? 1000 : 1200;
-    
-    this.npcManager.agregarNpcsEnZonaNoVisible(Larva, cantidadLarvas);
-    this.npcManager.agregarNpcsEnZonaNoVisible(Virus, cantidadVirus);
-    this.ampliarMapa();
-    this.npcManager.sacarNpcs(Ameba);
-  }
-
-  cargarNivel3() {
-    console.log("Cargando nivel 3");
-    const cantidadPeces = this.dificultad === 'facil' ? 7 : this.dificultad === 'normal' ? 10 : 15;
-    const cantidadLarvas = this.dificultad === 'facil' ? 400 : this.dificultad === 'normal' ? 500 : 600;
-    
-    this.npcManager.agregarNpcsEnZonaNoVisible(Pez, cantidadPeces);
-    this.npcManager.agregarNpcsEnZonaNoVisible(Larva, cantidadLarvas);
-    this.ampliarMapa();
-    this.npcManager.sacarNpcs(Virus);
-  }
-
-  ampliarMapa() {
-    this.fondo.ampliar(3);
-  }
-
-  verificarNivel() {
-    if (this.nivelActual === 2) {
-      // En el nivel 2, pasar al siguiente nivel al alcanzar 650 puntos
-      if (this.puntos >= 650) {
-        this.finalizarJuego(true);
-        //this.subirNivel();
-      }
-    } else if (this.nivelActual === 3) {
-      // En el nivel 3, verificar si quedan peces
-      const pecesRestantes = this.npcManager.todasLasEntidades.filter(entidad => entidad.constructor.name === 'Pez').length;
-      if (pecesRestantes === 0) {
-        this.finalizarJuego(true);
-      }
-    } else {
-      // Para el nivel 1, usar el sistema de radio
-      if (this.slime.radio >= this.radioNivelActual) {
-        this.subirNivel();
-      }
     }
   }
 

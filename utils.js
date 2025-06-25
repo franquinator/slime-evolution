@@ -124,12 +124,7 @@ function verificarValor(valor,nombre){
 function distanciaCuadrada(pos1, pos2) {
   return (pos2.x - pos1.x) + (pos2.y - pos1.y);
 }
-function assertEquals(expected,actual){
-  if(actual == expected){
-    console.log("test superado en")
-  }
-  else{
-    console.log("deberia ser "+expected+" pero es " + actual)
-  }
+function interpolacionLineal(valorInicial,valorFinal,t){
+  return valorInicial + (valorFinal - valorInicial) * t;
 }
 
