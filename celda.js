@@ -18,7 +18,7 @@ class Celda {
     if (!quien) return;
     for (let i = 0; i < this.entidadesAca.length; i++) {
       const entidad = this.entidadesAca[i];
-      if (quien.id == entidad.id) {
+      if (quien == entidad) {
         this.entidadesAca.splice(i, 1);
         return;
       }

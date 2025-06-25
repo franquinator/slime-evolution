@@ -11,14 +11,13 @@ class Juego {
       x: this.ancho / 2,
       y: this.alto / 2
     }
+
     this.mouse = { x: 0, y: 0 };
     this.mousePresionado = false;
 
     //variables de cambio de nivel
     this.finalizado = false;
-    this.nivelActual = 1;
-    this.radioNivel = [150,1300,2400];
-    this.radioNivelActual = this.radioNivel[this.nivelActual-1];
+
 
     //variables de juego
     this.slime = null;
@@ -47,8 +46,13 @@ class Juego {
     this.eventos = new Eventos(this);
     this.camara = new Camara(this);
     this.fondo = new Fondo(this, this.tamanioBase);
+    this.gestorNiveles = new GestorNiveles(this);
 
     this.recursos = new Map();
+
+    this.escalaDeJuego = 1;
+
+    
 
     this.app.init({ width: this.ancho, height: this.alto }).then(() => {
       this.pixiListo();
@@ -78,29 +82,25 @@ class Juego {
     //agrega elementos generales
     this.camara.inicializar();
     await this.hud.inicializar();
-    console.log("hud listo")
     await this.fondo.inicializar();
-    console.log("fondo listo")
 
     await this.precargarRecursos();
 
     this.slime = new SlimeProta(1500, 1500, 20, this);
     await this.slime.inicializar();
-    console.log("slime listo")
-    this.cargarNivel1();
-    console.log("nivel 1 listo")
+
+    this.gestorNiveles.cargarNivel0();
 
     //agrega elementos de PIXI
     window.__PIXI_APP__ = this.app;
     document.body.appendChild(this.app.canvas);
     console.log("pixi listo")
 
-    this.testearTiempo();
 
+    //this.testearTiempo();
 
     //comienza el gameloop
     this.app.ticker.add(() => this.gameLoop());
-    console.log("gameloop listo")
 
     //this.test();
   }
@@ -109,7 +109,7 @@ class Juego {
   }
   testearTiempo() {
     let tiempoInicial = performance.now();
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 1000; i++) {
       this.npcManager.update();
     }
     let tiempoFinal = performance.now();
@@ -195,8 +195,7 @@ class Juego {
   //funciones para cambiar de nivel
   cargarNivel1() {
     console.log("cargando nivel 1");
-    this.npcManager.ponerNpcsEnTodoElMapa(Virus, 10);
-    this.npcManager.ponerNpcsEnTodoElMapa(Ameba, 3000);
+
   }
 
   cargarNivel2() {
