@@ -7,7 +7,7 @@ class Fondo {
     }
     async inicializar() {
         // Cargar la textura
-        let textura = await PIXI.Assets.load("Assets/Graficos/bg.jpg");
+        let textura = await PIXI.Assets.load("Assets/Graficos/agua pixelartt.png");
     
         // Crear el TilingSprite con la textura y dimensiones
         this.sprite = new PIXI.TilingSprite(textura, this.width, this.height);

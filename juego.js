@@ -117,7 +117,7 @@ class Juego {
   }
   async precargarRecursos() {
     this.recursos.set("Assets/texture.json", await PIXI.Assets.load("Assets/texture.json"));
-    this.recursos.set("Assets/Graficos/bg.jpg", await PIXI.Assets.load("Assets/Graficos/bg.jpg"));
+    this.recursos.set("Assets/Graficos/bg.jpg", await PIXI.Assets.load("Assets/Graficos/agua pixelartt.png"));
     this.recursos.set("Assets/Graficos/corazon1.png", await PIXI.Assets.load("Assets/Graficos/corazon1.png"));
     this.recursos.set("Assets/Graficos/pqz.png", await PIXI.Assets.load("Assets/Graficos/pqz.png"));
     this.recursos.set("Assets/Graficos/cat.png", await PIXI.Assets.load("Assets/Graficos/cat.png"));
@@ -125,6 +125,9 @@ class Juego {
     this.recursos.set("Assets/Graficos/amoeba1.png", await PIXI.Assets.load("Assets/Graficos/amoeba1.png"));
     this.recursos.set("Assets/Graficos/amoeba2.png", await PIXI.Assets.load("Assets/Graficos/amoeba2.png"));
     this.recursos.set("Assets/Graficos/larva.pngq", await PIXI.Assets.load("Assets/Graficos/larva.png"));
+    this.recursos.set("Assets/Graficos/ameba agua.png", await PIXI.Assets.load("Assets/Graficos/ameba agua.png"));
+    this.recursos.set("Assets/Graficos/virusPixel.png", await PIXI.Assets.load("Assets/Graficos/virusPixel.png"));
+    this.recursos.set("Assets/Graficos/pezPixel.png", await PIXI.Assets.load("Assets/Graficos/pezPixel.png"));
   }
   //funciones de gameloop
   gameLoop() {
