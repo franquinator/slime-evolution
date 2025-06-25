@@ -27,11 +27,31 @@ class Larva extends NpcPasivo{
         this.cargarSprite("Assets/Graficos/larva.png",2);
         //this.MostrarCollider();
     }
+    update(){
+        super.update();
+        this.container.scale.x = 1;
+        this.sprite.rotation = Math.atan2(-this.vel.y, -this.vel.x);
+        
+
+    }
 }
 class Pez extends NpcPasivo{
     constructor(posX,posY,juego){
         super(posX,posY,2500,juego,1,"nadie");
         this.cargarSprite("Assets/Graficos/pezPixel.png",1.5);}
+    update(){
+        super.update();
+        if(this.vel.x > 0){
+            this.container.scale.y = 1;
+            this.sprite.rotation = Math.atan2(this.vel.y, this.vel.x);
+        }
+        else if(this.vel.x < 0){
+            this.container.scale.y = -1;
+            this.sprite.rotation = Math.atan2(-this.vel.y, this.vel.x);
+        }
+        
+
+    }
 /*         this.tiempoDesdeUltimoAtaque = 0;
         this.intervaloAtaque = 1000;
         this.territorio = {

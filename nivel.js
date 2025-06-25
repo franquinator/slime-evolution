@@ -18,12 +18,12 @@ class Nivel{
 
         let entidades = this.juego.npcManager.obtenerTodasLasEntidades();
         for(let entidad of entidades){
-            entidad.dividir(5);
+            entidad.dividir(this.tamaño);
         }
-        this.juego.slime.dividir(5);
-        this.juego.camara.hacerZoom(5);
+        this.juego.slime.dividir(this.tamaño);
+        this.juego.camara.hacerZoom(this.tamaño);
  
-        this.juego.escalaDeJuego *= 5;
+        this.juego.escalaDeJuego *= this.tamaño;
         for (let i = 0; i < this.listaNpcs.length; i++) {
              this.juego.npcManager.ponerNpcsEnTodoElMapa(this.listaNpcs[i],this.cantidades[i]);
             
