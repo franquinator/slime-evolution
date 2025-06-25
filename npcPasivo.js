@@ -104,7 +104,7 @@ class NpcPasivo extends Npc {
         alignment = vectorMultiplicacion(alignment, 1.5);
         cohesion = vectorMultiplicacion(cohesion, 0.5);
         separation = vectorMultiplicacion(separation, 2);
-        escape = vectorMultiplicacion(escape, 2);
+        escape = vectorMultiplicacion(escape, 1);
         separacionDeGrandes = vectorMultiplicacion(separacionDeGrandes, 4);
 
 

@@ -31,7 +31,7 @@ class Larva extends NpcPasivo{
 class Pez extends NpcAgresivo{
     constructor(posX,posY,juego){
         super(posX,posY,2000,juego,600,0.8);
-        this.cargarSprite("Assets/Graficos/pqz.png",500);
+        this.cargarSprite("Assets/Graficos/pezPixel.png",500);
         this.tiempoDesdeUltimoAtaque = 0;
         this.intervaloAtaque = 1000;
         this.territorio = {

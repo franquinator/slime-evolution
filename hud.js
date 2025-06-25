@@ -76,20 +76,20 @@ class Hud {
     
     dibujarBarraDeTurbo(){
         const alto = 20
-        const ancho = window.innerWidth / 2;
+        const ancho = window.innerWidth / 6;
         const fondo = new PIXI.Graphics();
         fondo.beginFill(0x4a4a4a);
         fondo.drawRoundedRect(0, 0, ancho, alto, 8);
         fondo.lineStyle(5, 0xffffff);
         fondo.endFill();
-        fondo.position.set(ancho / 2, window.innerHeight - 80);
+        fondo.position.set(20, window.innerHeight - 40);
         fondo.zIndex = 1;
 
         const barra = new PIXI.Graphics();
         barra.beginFill(0xff0000);
         barra.drawRoundedRect(0, 0, ancho, alto, 8);
         barra.endFill();
-        barra.position.set(ancho / 2, window.innerHeight - 80);
+        barra.position.set(20, window.innerHeight - 40);
         barra.zIndex = 2;
 
         this.hud.addChild(barra);
