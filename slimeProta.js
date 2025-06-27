@@ -52,8 +52,8 @@ class SlimeProta extends Entidad{
     }
 
     update(){
-        this.vel.x = 0;
-        this.vel.y = 0;
+        this.vel.x *= 0.9;
+        this.vel.y *= 0.9;
         this.sistemaTurbo();
 
         if(this.tiempoDesdeUltimoDaño > 0){

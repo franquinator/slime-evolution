@@ -20,7 +20,7 @@ class NpcPasivo extends Npc {
 
         this.separacion = {
             npcs : [],
-            mult : 0.01,
+            mult : 0.2,
             alcance : this.radio + 100
         }
 
@@ -45,12 +45,12 @@ class NpcPasivo extends Npc {
         this.aplicarSeparacion(this.separacion.npcs, this.separacion.mult);
         this.aplicarSeparacion(this.separacionDeMalos.npcs, this.separacionDeMalos.mult);
 
-/*         if (this.radio > this.juego.slime.radio) {
+        if (this.radio > this.juego.slime.radio) {
             this.aplicarPersecucion(this.juego.slime, this.multDePerseguir, this.alcanceDePersecucion)
         }
         else {
             this.aplicarEscape(this.juego.slime, this.multDeEscape, this.alcanceDeEscape)
-        } */
+        }
     }
 
 
