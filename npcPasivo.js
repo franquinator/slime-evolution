@@ -1,7 +1,7 @@
 class NpcPasivo extends Npc {
     constructor(posX, posY, radio, velocidadMax, juego, Enemigo) {
         super(posX, posY, radio, velocidadMax, juego);
-        //this.vel = { x: Math.random() * 10 - 5, y: Math.random() * 10 - 5 };
+        this.vel = { x: Math.random() * 10 - 5, y: Math.random() * 10 - 5 };
 
         this.npcsA100Mts = [];
         this.Enemigo = Enemigo;
@@ -26,7 +26,7 @@ class NpcPasivo extends Npc {
 
         this.separacionDeMalos = {
             npcs : [],
-            mult : 0.1,
+            mult : 2,
             alcance : 400
         }
 
@@ -44,27 +44,30 @@ class NpcPasivo extends Npc {
         this.aplicarCohesion(this.cohesion2.npcs, this.cohesion2.mult);
         this.aplicarSeparacion(this.separacion.npcs, this.separacion.mult);
         this.aplicarSeparacion(this.separacionDeMalos.npcs, this.separacionDeMalos.mult);
-        if (this.radio > this.juego.slime.radio) {
+
+/*         if (this.radio > this.juego.slime.radio) {
             this.aplicarPersecucion(this.juego.slime, this.multDePerseguir, this.alcanceDePersecucion)
         }
         else {
             this.aplicarEscape(this.juego.slime, this.multDeEscape, this.alcanceDeEscape)
-        }
+        } */
     }
 
 
 
     recopilarDatos() {
-        let distBusqueda;
-        distBusqueda = Math.max(this.alineacion.alcance,
+        let distBusqueda = Math.max(this.alineacion.alcance,
                                 this.cohesion2.alcance,
                                 this.separacion.alcance);
-        let NpcsCercanos = this.juego.grilla.obtenerNpsADistancia(distBusqueda, this)
+
+        let NpcsAmigosCercanos = 
+        this.juego.grilla.obtenerNpcsDeGrupoADistancia(distBusqueda, this, this.constructor.name)
+        
         this.cohesion2.npcs = [];
         this.separacion.npcs = [];
         this.alineacion.npcs = [];
 
-        for (let npc of NpcsCercanos) {
+        for (let npc of NpcsAmigosCercanos) {
             if (npc == this) continue;
             let d = distancia(this.position, npc.position);
             if (d < this.alineacion.alcance) {
@@ -78,11 +81,15 @@ class NpcPasivo extends Npc {
             }
         }
 
-        this.npcsMalosParaMiA50mts = [];
-        for (let npc of this.juego.npcManager.obtenerGrupoDeEntidades(this.Enemigo)) {
+        this.separacionDeMalos.npcs = [];
+        let NpcsMalosCercanos = 
+        this.juego.grilla.obtenerNpcsDeGrupoADistancia(distBusqueda, this, this.Enemigo);
+        
+        for (let npc of NpcsMalosCercanos) {
+            if(npc == this)continue;
             let d = distancia(this.position, npc.position);
-            if (npc != this && d < 400) {
-                this.npcsMalosParaMiA50mts.push({ Npc: npc, Dist: d });
+            if (d < this.separacionDeMalos.alcance) {
+                this.separacionDeMalos.npcs.push({ Npc: npc, Dist: d });
             }
         }
     }

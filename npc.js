@@ -124,7 +124,7 @@ class Npc extends Entidad {
         this.juego.grilla.actualizarNpcEnGrilla(this);
     }
     destroy(){
-        this.celda.sacame(this);
+        this.celda.sacarNpc(this);
         super.destroy();
     }
 }

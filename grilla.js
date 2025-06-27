@@ -22,14 +22,14 @@ class Grilla {
 
     añadirNpcEnGrilla(npc) {
         const celda = this.obtenerCeldaEnPosicion(npc.position.x, npc.position.y);
-        celda.agregame(npc);
+        celda.agregarNpc(npc);
     }
 
     actualizarNpcEnGrilla(npc) {
         const celda = this.obtenerCeldaEnPosicion(npc.position.x, npc.position.y);
         if (npc.celda != celda) {
-            npc.celda.sacame(npc);
-            celda.agregame(npc);
+            npc.celda.sacarNpc(npc);
+            celda.agregarNpc(npc);
         }
     }
 
@@ -78,15 +78,28 @@ class Grilla {
         return (dist);
     }
 
-    obtenerNpsADistancia(distancia, npcIn) {
+    obtenerTodosLosNpsADistancia(distancia, npcIn) {
         let celdasCercanas = this.obtenerCeldasADistancia(distancia, npcIn.position.x, npcIn.position.y);
 
-        let nps = [];
+        let npcs = [];
         for (let celda of celdasCercanas) {
-            nps = nps.concat(celda.entidadesAca)
+            let npcsEnCelda = celda.obtenerTodasLasEntidades();
+            npcs = npcs.concat(npcsEnCelda)
         }
-        return nps;
+        return npcs;
     }
+    
+    obtenerNpcsDeGrupoADistancia(distancia, npcIn, grupo){
+        let celdasCercanas = this.obtenerCeldasADistancia(distancia, npcIn.position.x, npcIn.position.y);
+
+        let npcs = [];
+        for (let celda of celdasCercanas) {
+            let npcsEnCelda = celda.obtenerGrupoDeEntidades(grupo);
+            npcs = npcs.concat(npcsEnCelda);
+        }
+        return npcs;
+    }
+    
     obtenerTodasLasEntidades() {
         let npcs = [];
         for (let celda of Object.values(this.celdas)) {
@@ -99,8 +112,10 @@ class Grilla {
         let npcs = [];
         let celdasCercanas = this.obtenerCeldasADistancia(entidad.radio * 2, entidad.position.x, entidad.position.y);
         for (let celda of celdasCercanas) {
-            for (let npc of celda.entidadesAca) {
-                if (npc != entidad && distancia(npc.position, entidad.position) < npc.radio + entidad.radio) {
+
+            let npcsEnCelda = celda.obtenerTodasLasEntidades();
+            for (let npc of npcsEnCelda) {
+                if(npc != entidad && colisionan(entidad,npc)){
                     npcs.push(npc);
                 }
             }

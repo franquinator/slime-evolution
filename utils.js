@@ -156,4 +156,7 @@ function distanciaCuadrada(pos1, pos2) {
 function interpolacionLineal(valorInicial, valorFinal, t) {
   return valorInicial + (valorFinal - valorInicial) * t;
 }
+function colisionan(entidad1, entidad2){
+  return distancia(entidad1.position, entidad2.position) < entidad1.radio + entidad2.radio;
+}
 

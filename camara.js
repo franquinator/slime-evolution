@@ -6,7 +6,7 @@ class Camara {
         this.factorSuavizado = 0.1;
 
         this.factorSuavizadoescala = 0.1;
-        this.escala = 0.5;
+        this.escala = 0.25;
         
     }
 
