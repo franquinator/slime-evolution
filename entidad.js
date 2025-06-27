@@ -1,5 +1,5 @@
 class Entidad {
-    constructor(posX, posY, radio, juego, valorNutricional) {
+    constructor(posX, posY, radio, velocidadMax, juego) {
         verificarValor(posX, "posX");
         verificarValor(posY, "posY");
         verificarValor(radio, "radio");
@@ -8,20 +8,18 @@ class Entidad {
         this.position = { x: posX, y: posY };
 
         this.radio = radio / juego.escalaDeJuego;
-        this.valorNutricional = valorNutricional;
-        this.scaleOffset = 0;
+
+        this.velocidadMax = velocidadMax;
+        
         this.juego = juego;
+
+        this.scaleOffset = 0;
 
         this.vel = { x: 0, y: 0 };
         this.aceleracion = { x: 0, y: 0 };
 
-        this.velocidadMax = 1;
-        this.MultiplicadorDeAceleracion = 0.1;
-        this.friccion = 0.90;
-
         this.container = new PIXI.Container();
         this.fuiEliminado = false;
-        //this.MostrarCollider();
     }
 
     async MostrarCollider() {
@@ -39,8 +37,10 @@ class Entidad {
     async cargarSprite(ruta, escalaExtra) {
         this.scaleOffset = escalaExtra;
         let textura = await PIXI.Assets.load(ruta);
+        textura.scaleMode = 'nearest';
 
         this.sprite = new PIXI.Sprite(textura);
+        this.sprite.scaleMode = 'nearest';
         this.sprite.setSize(this.radio * 2 * escalaExtra);
         this.sprite.anchor.set(0.5, 0.5);
 
@@ -53,8 +53,10 @@ class Entidad {
     cargarSprite2(nombre, escalaExtra) {
         this.scaleOffset = escalaExtra;
         let textura = this.juego.recursos.get(nombre);
+        textura.scaleMode = 'nearest';
 
         this.sprite = new PIXI.Sprite(textura);
+        this.sprite.scaleMode = 'nearest';
         this.sprite.setSize(this.radio * 2 * escalaExtra);
         this.sprite.anchor.set(0.5, 0.5);
 
@@ -63,6 +65,7 @@ class Entidad {
 
         this.juego.worldContainer.addChild(this.container);
     }
+
     dividir(veces){
         this.position.x /= veces;
         this.position.y /= veces;
@@ -77,18 +80,29 @@ class Entidad {
     }
 
     update() {
-        this.aplicarAceleracion();
-        this.aplicarFriccion();
-        this.aplicarVelocidad();
-        //this.actualizarMiPosicionEnLaGrilla();
+        this.aplicarFisicas();
+        this.mantenerEnBordes();
     }
 
-    asignarVelocidad(x, y) {
-        if (isNaN(x) || isNaN(y)) {
-            throw new Error("Velocidad NaN detectada");
-        }
-        this.vel.x = x;
-        this.vel.y = y;
+    aplicarFisicas(){
+        //aplica aceleracion
+        this.vel = vectorSuma(this.vel, this.aceleracion);
+
+        this.vel = limit(this.vel, this.velocidadMax);
+
+
+
+        //aplica velocidad
+        this.position = vectorSuma(this.position, this.vel);
+
+        this.aceleracion = { x: 0, y: 0 };
+    }
+
+    mantenerEnBordes() {
+        if (this.position.x < 0) this.position.x = this.juego.fondo.width - 1;
+        if (this.position.x > this.juego.fondo.width) this.position.x = 0;
+        if (this.position.y < 0) this.position.y = this.juego.fondo.height - 1;
+        if (this.position.y > this.juego.fondo.height) this.position.y = 0;
     }
 
     asignarAceleracion(x, y) {
@@ -99,76 +113,13 @@ class Entidad {
         this.aceleracion.y = y;
     }
 
-    asignarAceleracionNormalizada(x, y) {
-        if (isNaN(x) || isNaN(y)) {
-            throw new Error("Aceleración NaN detectada");
-        }
-        const aceleracionNormalizada = normalizar(x, y);
-        this.aceleracion.x = aceleracionNormalizada.x * this.MultiplicadorDeAceleracion;
-        this.aceleracion.y = aceleracionNormalizada.y * this.MultiplicadorDeAceleracion;
-    }
-
-    asignarVelocidadNormalizada(x, y) {
-        if (isNaN(x) || isNaN(y)) {
-            throw new Error("Velocidad NaN detectada");
-        }
-        const velocidadNormalizada = normalizar(x, y);
-        this.vel.x = velocidadNormalizada.x;
-        this.vel.y = velocidadNormalizada.y;
-    }
-
-    aplicarAceleracion() {
-        if (velocidadLinear(this.vel.x, this.vel.y) < this.velocidadMax) {
-            this.vel.x += this.aceleracion.x;
-            this.vel.y += this.aceleracion.y;
-        }
-    }
-
-    aplicarVelocidad() {
-        const delta = this.juego.delta;
-        this.position.x += this.vel.x * delta;
-        this.position.y += this.vel.y * delta;
-    }
-
-    irA(x, y) {
-        this.position.x = x;
-        this.position.y = y;
-    }
-
-    frenar() {
-        this.vel.x = 0;
-        this.vel.y = 0;
-        this.aceleracion.x = 0;
-        this.aceleracion.y = 0;
-    }
-
-    aplicarFriccion() {
-        this.vel.x *= this.friccion;
-        this.vel.y *= this.friccion;
-    }
-
-/*     actualizarMiPosicionEnLaGrilla() {
-        const celdaActual = this.juego.grilla.obtenerCeldaEnPosicion(
-            this.position.x,
-            this.position.y
-        );
-        if (this.celda && celdaActual && celdaActual != this.celda) {
-            this.celda.sacame(this);
-            celdaActual.agregame(this);
-            this.celda = celdaActual;
-        } else if (!this.celda && celdaActual) {
-            celdaActual.agregame(this);
-            this.celda = celdaActual;
-        }
-    } */
-
     render() {
         this.container.x = this.position.x;
         this.container.y = this.position.y;
     }
     
     destroy() {
-        this.celda.sacame(this);
+        //
         this.fuiEliminado = true;
         this.juego.npcManager.eliminarEntidad(this);
         this.container.destroy();

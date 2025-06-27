@@ -80,9 +80,10 @@ class Grilla {
 
     obtenerNpsADistancia(distancia, npcIn) {
         let celdasCercanas = this.obtenerCeldasADistancia(distancia, npcIn.position.x, npcIn.position.y);
+
         let nps = [];
         for (let celda of celdasCercanas) {
-            nps.concat(celda.entidadesAca)
+            nps = nps.concat(celda.entidadesAca)
         }
         return nps;
     }

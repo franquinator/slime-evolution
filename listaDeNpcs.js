@@ -1,7 +1,7 @@
 class Ameba extends NpcPasivo{
     constructor(posX,posY,juego){
         //el 20 es el radio y el 300 es el radio de vision y el 0.3 es la velocidad
-        super(posX,posY,20,juego,2,"Virus");
+        super(posX,posY,20,10,juego,"Virus");
         this.velocidadMax = 5;
 
         let probabilidadDeSprite = Math.random();
@@ -16,14 +16,14 @@ class Ameba extends NpcPasivo{
 }
 class Virus extends NpcPasivo{
     constructor(posX,posY,juego){
-        super(posX,posY,100,juego,2,"Larva");
+        super(posX,posY,100,10,juego,"Larva");
         this.cargarSprite2("Assets/Graficos/virusPixel.png",2);
         //this.MostrarCollider();
     }
 }
 class Larva extends NpcPasivo{
     constructor(posX,posY,juego){
-        super(posX,posY,500,juego,1,"Pez");
+        super(posX,posY,500,10,juego,"Pez");
         this.cargarSprite("Assets/Graficos/larva.png",2);
         //this.MostrarCollider();
     }
@@ -35,7 +35,7 @@ class Larva extends NpcPasivo{
 }
 class Pez extends NpcPasivo{
     constructor(posX,posY,juego){
-        super(posX,posY,2500,juego,1,"nadie");
+        super(posX,posY,2500,10,juego,"nadie");
         this.cargarSprite("Assets/Graficos/pezPixel.png",1.5);}
     render(){
         super.render()
@@ -48,35 +48,5 @@ class Pez extends NpcPasivo{
             this.container.scale.y = -1;
             this.sprite.rotation = Math.atan2(-this.vel.y, this.vel.x);
         }
-    }
-/*         this.tiempoDesdeUltimoAtaque = 0;
-        this.intervaloAtaque = 1000;
-        this.territorio = {
-            x: posX,
-            y: posY,
-            radio: 800
-        };
-    }
-
-    update() {
-        const distanciaAlTerritorio = distancia(this.position, this.territorio);
-        if (distanciaAlTerritorio < this.territorio.radio) {
-            if (this.estaA_DistaciaDe_(this.radioDeEscape, this.juego.slime)) {
-                if (this.tiempoDesdeUltimoAtaque <= 0) {
-                    this.perseguirA(this.juego.slime);
-                    this.tiempoDesdeUltimoAtaque = this.intervaloAtaque;
-                } else {
-                    this.tiempoDesdeUltimoAtaque -= this.juego.delta;
-                }
-            }
-        } else {
-            super.update();
-        }
-    } */
-}
-class Gato extends NpcAgresivo {
-    constructor(posX, posY, juego) {
-        super(posX, posY, 800, juego, 400, 0.5);
-        this.cargarSprite("Assets/Graficos/cat.png", 20);
     }
 }

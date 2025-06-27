@@ -1,24 +1,28 @@
 class SlimeProta extends Entidad{
     constructor(posX,posY,radio,juego){
-        super(posX,posY,radio,juego);
+        super(posX,posY,radio,20,juego);
         this.tiempoDesdeUltimoDaño = 0;
 
         this.scaleOffset = 4;
         this.animacionActual = null;
 
-        this.turboMax = 1000;
-        this.cantTurbo = 1000;
+        this.MultiplicadorDeMouse = 100;
+        
+        //variables de turbo
+        this.turboMax = 2000;
+        this.cantTurbo = 2000;
         
         this.penalizacionTurboInsuficiente = 1000;
 
         this.velRecupTurbo = 0.5;
         this.velCosumoTurbo = 1;
 
-        this.velTurbo = 1.5;
-        this.velNormal = 1;
+        //variables de velocidad
+        this.velTurbo = 40;
+        this.velNormal = 20;
 
-        this.multDeVelocidad = 1;
         this.colisionesActivas = true;
+
         this.MostrarCollider();
     }
 
@@ -29,6 +33,7 @@ class SlimeProta extends Entidad{
     async cargarAnimacion() {
         // Carga el spritesheet
         this.sheet = await PIXI.Assets.load("Assets/texture.json");
+        this.sheet.textureSource.scaleMode = 'nearest';
 
         // Creamos la animación con los frames "move"
         this.sprite = new PIXI.AnimatedSprite(this.sheet.animations["move"]);
@@ -46,14 +51,9 @@ class SlimeProta extends Entidad{
         this.juego.worldContainer.addChild(this.container);
     }
 
-    edges() {
-        if (this.position.x < 0) this.position.x = this.juego.fondo.width-1;
-        if (this.position.x > this.juego.fondo.width) this.position.x = 0;
-        if (this.position.y < 0) this.position.y = this.juego.fondo.height-1;
-        if (this.position.y > this.juego.fondo.height) this.position.y = 0;
-    }
-
     update(){
+        this.vel.x = 0;
+        this.vel.y = 0;
         this.sistemaTurbo();
 
         if(this.tiempoDesdeUltimoDaño > 0){
@@ -61,10 +61,10 @@ class SlimeProta extends Entidad{
         }
 
         this.asignarFuerzaQueMeLlevaAlMouse();
+
         if(this.colisionesActivas){
             this.verificarColisiones();
         }
-        this.edges();
         super.update();
         
     }
@@ -73,7 +73,7 @@ class SlimeProta extends Entidad{
         if(this.juego.mousePresionado && this.cantTurbo > 0){
             this.cantTurbo -= this.juego.delta * this.velCosumoTurbo;
 
-            this.multDeVelocidad = this.velTurbo;
+            this.velocidadMax = this.velTurbo;
             
             if(this.cantTurbo <= 0){
                 this.cantTurbo = -this.penalizacionTurboInsuficiente
@@ -83,7 +83,7 @@ class SlimeProta extends Entidad{
             this.cantTurbo += this.juego.delta * this.velRecupTurbo;
             this.cantTurbo = Math.min(this.turboMax,this.cantTurbo);
 
-            this.multDeVelocidad = this.velNormal;
+            this.velocidadMax = this.velNormal;
         }
         this.juego.hud.setBarraTurbo(this.cantTurbo / this.turboMax * 100);
     }
@@ -139,14 +139,7 @@ class SlimeProta extends Entidad{
             this.posicionEnPantalla()
         );
 
-        this.asignarAceleracion(fuerza.x * this.MultiplicadorDeAceleracion , fuerza.y * this.MultiplicadorDeAceleracion);
-    }
-
-    aplicarVelocidad() {
-        const delta = this.juego.delta;
-
-        this.position.x += this.vel.x * delta * this.multDeVelocidad;
-        this.position.y += this.vel.y * delta * this.multDeVelocidad;
+        this.asignarAceleracion(fuerza.x * this.MultiplicadorDeMouse , fuerza.y * this.MultiplicadorDeMouse);
     }
 
     posicionEnPantalla(){
@@ -206,14 +199,5 @@ class SlimeProta extends Entidad{
         if(this.radio >= this.juego.gestorNiveles.radioNivelActual()){
             this.juego.gestorNiveles.subirNivel();
         }
-    }
-    dividir(veces){
-        this.position.x /= veces;
-        this.position.y /= veces;
-
-        this.radio /= veces;
-        this.sprite.setSize(this.radio * 2 * this.scaleOffset);
-        this.collider.setSize(this.radio * 2)
-
     }
 }

@@ -1,54 +1,130 @@
-class Npc extends Entidad{
-    constructor(posX,posY,radio,juego,velocidadMax){
-        super(posX,posY,radio,juego);
-        this.velocidadMax = velocidadMax;
-        this.distanciaAlJugador = 0;
-        this.tiempoQuieto = 0;
-        this.ultimaPosicion = {x: posX, y: posY};
-        this.tiempoMaximoQuieto = 5000; // 5 segundos
+class Npc extends Entidad {
+    constructor(posX, posY, radio, velocidadMax, juego) {
+        super(posX, posY, radio, velocidadMax, juego);
+
+        this.celda = null;
+        this.juego.grilla.añadirNpcEnGrilla(this);
     }
-    update() {
-        // Verificar si está quieto
-        if (distancia(this.position, this.ultimaPosicion) < 1) {
-            this.tiempoQuieto += this.juego.delta;
-            if (this.tiempoQuieto >= this.tiempoMaximoQuieto) {
-                this.juego.npcManager.eliminarEntidad(this);
-                return;
-            }
-        } else {
-            this.tiempoQuieto = 0;
-            this.ultimaPosicion = {x: this.position.x, y: this.position.y};
-        }
-        super.update();
+    aplicarAlineacion(boids, potencia) {
+        let fuerzaDeAlign = this.align(boids);
+        fuerzaDeAlign = vectorMultiplicacion(fuerzaDeAlign, potencia);
+        this.aceleracion = vectorSuma(this.aceleracion, fuerzaDeAlign);
     }
 
-    perseguirA(objetivo) {
-        const dir = getUnitVector(objetivo.position, this.position);
-        this.asignarAceleracionNormalizada(
-          dir.x * this.MultiplicadorDeAceleracion,
-          dir.y * this.MultiplicadorDeAceleracion
-        );
-    }
-    huirDe(enemigo){
-        const direccionDeHuida = getUnitVector(enemigo.position,this.position);
-        this.asignarAceleracionNormalizada(
-            direccionDeHuida.x * -1 * this.MultiplicadorDeAceleracion,
-            direccionDeHuida.y * -1 * this.MultiplicadorDeAceleracion);
-    }
-    deambular(){
-        if(this.puntoDeDestino === undefined || distancia(this.puntoDeDestino,this.position) < 10 ){
-            this.puntoDeDestino = {x:this.getLimites().limX.min + (Math.random() * (this.juego.fondo.width - this.radio * 2)) ,
-                                   y:this.getLimites().limY.min + (Math.random() * (this.juego.fondo.height - this.radio * 2)) };
-        }
-        //console.log(this.puntoDeDestino);
-        //console.log(this.position);
-        const direccion = getUnitVector(this.puntoDeDestino,this.position);
-        this.asignarAceleracionNormalizada(direccion.x * this.MultiplicadorDeAceleracion,
-                                           direccion.y * this.MultiplicadorDeAceleracion);
-    }
-    estaA_DistaciaDe_(distacia,objetivo){
-        if(objetivo === undefined) return false;
-        return distancia(this.position,objetivo.position)-objetivo.radio-this.radio < distacia;
+    aplicarCohesion(boids, potencia) {
+        let fuerzaDeCohesion = this.cohesion(boids);
+        fuerzaDeCohesion = vectorMultiplicacion(fuerzaDeCohesion, potencia);
+        this.aceleracion = vectorSuma(this.aceleracion, fuerzaDeCohesion);
     }
 
+    aplicarSeparacion(boids, potencia) {
+        let fuerzaDeSeparacion = this.separation(boids);
+        fuerzaDeSeparacion = vectorMultiplicacion(fuerzaDeSeparacion, potencia);
+        this.aceleracion = vectorSuma(this.aceleracion, fuerzaDeSeparacion);
+    }
+
+    aplicarEscape(unBoid, potencia, radio) {
+        let fuerzaDeEscape = this.escape(unBoid, radio);
+        fuerzaDeEscape = vectorMultiplicacion(fuerzaDeEscape, potencia);
+        this.aceleracion = vectorSuma(this.aceleracion, fuerzaDeEscape);
+    }
+
+    aplicarPersecucion(unBoid, potencia, radio) {
+        let fuerzaDePersecucion = this.persecucion(unBoid, radio);
+        fuerzaDePersecucion = vectorMultiplicacion(fuerzaDePersecucion, potencia);
+        this.aceleracion = vectorSuma(this.aceleracion, fuerzaDePersecucion);
+    }
+
+    align(boids) {
+        let steering = { x: 0, y: 0 };
+        let total = 0;
+        
+        for (let npc of boids) {
+            steering = vectorSuma(steering, npc.Npc.vel);
+            total++;
+        }
+
+        if (total > 0) {
+            steering = vectorDivision(steering, total);
+            steering = setMag(steering, this.velocidadMax);
+            steering = vectorResta(steering, this.vel);
+            steering = limit(steering, this.maxForce);
+        }
+        return steering;
+    }
+
+    separation(boids) {
+        let steering = { x: 0, y: 0 };
+        let total = 0;
+        for (let npc of boids) {
+            let diff = vectorResta(this.position, npc.Npc.position);
+            diff = vectorDivision(diff, npc.Dist * npc.Dist);
+            steering = vectorSuma(steering, diff);
+            total++;
+        }
+
+        if (total > 0) {
+            steering = vectorDivision(steering, total);
+            steering = setMag(steering, this.velocidadMax);
+            steering = vectorResta(steering, this.vel);
+            steering = limit(steering, this.maxForce);
+        }
+        return steering;
+    }
+
+    cohesion(boids) {
+        let steering = { x: 0, y: 0 };
+        let total = 0;
+        for (let npc of boids) {
+            steering = vectorSuma(steering, npc.Npc.position);
+            total++;
+        }
+
+        if (total > 0) {
+            steering = vectorDivision(steering, total);
+            steering = vectorResta(steering, this.position);
+            steering = setMag(steering, this.velocidadMax);
+            steering = vectorResta(steering, this.vel);
+            steering = limit(steering, this.maxForce);
+        }
+        return steering;
+    }
+
+    escape(slime, radio) {
+        verificarValor(slime, "slime");
+        verificarNumero(radio, "radio");
+        
+        let perceptionRadius = radio + slime.radio;
+        let steering = { x: 0, y: 0 };
+        let d = distancia(this.position, slime.position);
+        if (d < perceptionRadius) {
+            //console.log("slime cerca");
+            let direccionDeHuida = getUnitVector(slime.position, this.position);
+            direccionDeHuida = vectorMultiplicacion(direccionDeHuida, -1);
+            //console.log(direccionDeHuida);
+            steering = vectorSuma(steering, direccionDeHuida);
+        }
+        return steering;
+    }
+
+    persecucion(slime, radio) {
+        let perceptionRadius = radio;
+        let steering = { x: 0, y: 0 };
+        let d = distancia(this.position, slime.position);
+        if (d < perceptionRadius + slime.radio) {
+            //console.log("slime cerca");
+            let direccionDeHuida = getUnitVector(slime.position, this.position);
+            //console.log(direccionDeHuida);
+            steering = vectorSuma(steering, direccionDeHuida);
+        }
+        return steering;
+    }
+
+    actualizarPosicionEnGrilla(){
+        this.juego.grilla.actualizarNpcEnGrilla(this);
+    }
+    destroy(){
+        this.celda.sacame(this);
+        super.destroy();
+    }
 }

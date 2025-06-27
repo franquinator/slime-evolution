@@ -3,23 +3,30 @@ class Camara {
         this.juego = juego;
         // Inicializar la escala del contenedor con un valor inicial apropiado
         this.juego.worldContainer.scale.set(0.8, 0.8);
-        this.escalaMinima = 1;  // Valor base para nivel 1
-        this.escalaMaxima = 1.5;
         this.factorSuavizado = 0.1;
 
         this.factorSuavizadoescala = 0.1;
         this.escala = 0.5;
+        
     }
 
     inicializar() {
         this.juego.app.stage.addChild(this.juego.worldContainer);
         this.ajustarTamanio(this.escala);
+        this.objetivo = this.juego.slime;
+    }
+    ponerObjetivo(objetivo) {
+        if (!objetivo) {
+            console.warn('Objetivo no definido, se usará el slime por defecto');
+            this.objetivo = this.juego.slime;
+        }
+        this.objetivo = objetivo;
     }
 
     actualizar() {
         
         const { worldContainer, slime, fondo } = this.juego;
-        if (!slime || !fondo) {
+        if (!this.objetivo || !fondo) {
             console.warn('No se puede actualizar la cámara: slime o fondo no están definidos');
             return;
         }
@@ -36,8 +43,8 @@ class Camara {
         };
 
         // Calcular la posición objetivo de la cámara
-        let targetX = -slime.position.x * escalaX + (this.juego.app.screen.width / 2);
-        let targetY = -slime.position.y * escalaY + (this.juego.app.screen.height / 2);
+        let targetX = -this.objetivo.position.x * escalaX + (this.juego.app.screen.width / 2);
+        let targetY = -this.objetivo.position.y * escalaY + (this.juego.app.screen.height / 2);
 
         // Calcular los límites de la cámara
         const limitesCamara = {

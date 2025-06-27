@@ -33,7 +33,7 @@ function getUnitVector(posObj2, posObj) {
   };
 }
 function vaMuyLento(x, y) {
-  return velocidadLinear(x,y) < 0.1;
+  return velocidadLinear(x, y) < 0.1;
 }
 function velocidadLinear(x, y) {
   return Math.sqrt(x * x + y * y);
@@ -44,7 +44,7 @@ function distancia(x1, y1, x2, y2) {
 function distancia(pos1, pos2) {
   return Math.sqrt((pos2.x - pos1.x) ** 2 + (pos2.y - pos1.y) ** 2);
 }
-function normalizar(vel){
+function normalizar(vel) {
 
   let length = Math.sqrt(vel.x * vel.x + vel.y * vel.y);
 
@@ -55,7 +55,7 @@ function normalizar(vel){
     y: vel.y / length,
   };
 }
-function normalizar(x,y){
+function normalizar(x, y) {
 
   let length = Math.sqrt(x * x + y * y);
 
@@ -71,7 +71,7 @@ function clamp(valor, min, max) {
 }
 function limit(vector, max) {
   const magnitudActual = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-  
+
   if (magnitudActual > max && magnitudActual > 0) {
     const ratio = max / magnitudActual;
     return {
@@ -79,28 +79,52 @@ function limit(vector, max) {
       y: vector.y * ratio
     };
   }
-  
+
   return vector;
 }
 function vectorSuma(vector1, vector2) {
+  if (isNaN(vector1.x) || isNaN(vector1.y)) {
+    throw new Error("vector1 NaN detectado");
+  }
+  if (isNaN(vector2.x) || isNaN(vector2.y)) {
+    throw new Error("vector2 NaN detectado");
+  }
   return {
     x: vector1.x + vector2.x,
     y: vector1.y + vector2.y
   };
 }
 function vectorResta(vector1, vector2) {
+  if (isNaN(vector1.x) || isNaN(vector1.y)) {
+    throw new Error("vector1 NaN detectado");
+  }
+  if (isNaN(vector2.x) || isNaN(vector2.y)) {
+    throw new Error("vector2 NaN detectado");
+  }
   return {
     x: vector1.x - vector2.x,
     y: vector1.y - vector2.y
   };
 }
 function vectorMultiplicacion(vector, factor) {
+  if (isNaN(vector.x) || isNaN(vector.y)) {
+    throw new Error("vector NaN detectado");
+  }
+  if (isNaN(factor)) {
+    throw new Error("factor NaN detectado");
+  }
   return {
     x: vector.x * factor,
     y: vector.y * factor
   };
 }
 function vectorDivision(vector, factor) {
+  if (isNaN(vector.x) || isNaN(vector.y)) {
+    throw new Error("vector NaN detectado");
+  }
+  if (isNaN(factor)) {
+    throw new Error("factor NaN detectado");
+  }
   return {
     x: vector.x / factor,
     y: vector.y / factor
@@ -109,22 +133,27 @@ function vectorDivision(vector, factor) {
 function setMag(vector, magnitud) {
   // Primero normalizamos el vector (lo convertimos en un vector unitario)
   const vectorNormalizado = normalizar(vector.x, vector.y);
-  
+
   // Luego multiplicamos por la magnitud deseada
   return {
     x: vectorNormalizado.x * magnitud,
     y: vectorNormalizado.y * magnitud
   };
 }
-function verificarValor(valor,nombre){
-  if(!valor){
-    console.error(nombre+" es invalida");
+function verificarValor(valor, nombre) {
+  if (!valor) {
+    throw new Error(nombre + " es invalida");
+  }
+}
+function verificarNumero(valor, nombre) {
+  if (isNaN(valor)) {
+    throw new Error(nombre + " es NaN");
   }
 }
 function distanciaCuadrada(pos1, pos2) {
   return (pos2.x - pos1.x) + (pos2.y - pos1.y);
 }
-function interpolacionLineal(valorInicial,valorFinal,t){
+function interpolacionLineal(valorInicial, valorFinal, t) {
   return valorInicial + (valorFinal - valorInicial) * t;
 }
 
