@@ -41,6 +41,7 @@ class Juego {
     //variables de componentes
 
     this.grilla = new Grilla(this, 400);
+    this.filtro = new Filtro(this);
     this.hud = new Hud(this);
     this.npcManager = new NpcManager(this);
     this.eventos = new Eventos(this);
@@ -70,6 +71,7 @@ class Juego {
   async pixiListo() {
     //agrega elementos generales
     this.camara.inicializar();
+    await this.filtro.inicializar();
     await this.hud.inicializar();
     await this.fondo.inicializar();
 
@@ -124,6 +126,7 @@ class Juego {
     this.actualizarContadorFps();
     this.actualizarProtagonista();
     this.npcManager.update();
+    this.filtro.update();
   }
 
   actualizarDeltaTime() {
