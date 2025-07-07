@@ -106,18 +106,13 @@ class Juego {
     console.log("tiempo de update: " + (tiempoFinal - tiempoInicial) + "ms");
   }
   async precargarRecursos() {
-    this.recursos.set("Assets/texture.json", await PIXI.Assets.load("Assets/texture.json"));
-    this.recursos.set("Assets/Graficos/bg.jpg", await PIXI.Assets.load("Assets/Graficos/agua pixelartt.png"));
-    this.recursos.set("Assets/Graficos/corazon1.png", await PIXI.Assets.load("Assets/Graficos/corazon1.png"));
-    this.recursos.set("Assets/Graficos/pqz.png", await PIXI.Assets.load("Assets/Graficos/pqz.png"));
-    this.recursos.set("Assets/Graficos/cat.png", await PIXI.Assets.load("Assets/Graficos/cat.png"));
-    this.recursos.set("Assets/Graficos/bacteria1.png", await PIXI.Assets.load("Assets/Graficos/bacteria1.png"));
-    this.recursos.set("Assets/Graficos/amoeba1.png", await PIXI.Assets.load("Assets/Graficos/amoeba1.png"));
-    this.recursos.set("Assets/Graficos/amoeba2.png", await PIXI.Assets.load("Assets/Graficos/amoeba2.png"));
-    this.recursos.set("Assets/Graficos/larva.pngq", await PIXI.Assets.load("Assets/Graficos/larva.png"));
-    this.recursos.set("Assets/Graficos/ameba agua.png", await PIXI.Assets.load("Assets/Graficos/ameba agua.png"));
-    this.recursos.set("Assets/Graficos/virusPixel.png", await PIXI.Assets.load("Assets/Graficos/virusPixel.png"));
-    this.recursos.set("Assets/Graficos/pezPixel.png", await PIXI.Assets.load("Assets/Graficos/pezPixel.png"));
+    this.recursos.set("amebaAgua", await PIXI.Assets.load("Assets/Graficos/ameba agua.png"));
+    this.recursos.set("slime", await PIXI.Assets.load("Assets/texture.json"));
+    this.recursos.set("amebaAmarilla", await PIXI.Assets.load("Assets/Graficos/ameba amarilla.png"));
+    this.recursos.set("larva", await PIXI.Assets.load("Assets/Graficos/larva.png"));
+    this.recursos.set("virus", await PIXI.Assets.load("Assets/Graficos/virusPixel.png"));
+    this.recursos.set("pez", await PIXI.Assets.load("Assets/Graficos/pezPixel.png"));
+    this.recursos.set("tiburon", await PIXI.Assets.load("Assets/Graficos/tiburonazoPixel.png"));
   }
   //funciones de gameloop
   gameLoop() {

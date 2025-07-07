@@ -34,7 +34,7 @@ class Entidad {
         this.container.addChild(this.collider);
     }
 
-    async cargarSprite(ruta, escalaExtra) {
+    async cargarSpriteAsincrono(ruta, escalaExtra) {
         this.scaleOffset = escalaExtra;
         let textura = await PIXI.Assets.load(ruta);
         textura.scaleMode = 'nearest';
@@ -50,7 +50,7 @@ class Entidad {
         this.juego.worldContainer.addChild(this.container);
     }
 
-    cargarSprite2(nombre, escalaExtra) {
+    cargarSprite(nombre, escalaExtra) {
         this.scaleOffset = escalaExtra;
         let textura = this.juego.recursos.get(nombre);
         textura.scaleMode = 'nearest';
