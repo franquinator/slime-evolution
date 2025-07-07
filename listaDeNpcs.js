@@ -53,9 +53,8 @@ class Pez extends NpcPasivo{
 
 class Tank extends NpcPasivo{
     constructor(posX,posY,juego){
-        super(posX,posY,8000,10,juego,"nadie");
-        this.cargarSprite("Assets/Graficos/tank.png",2);
-        
+        super(posX,posY,5000,10,juego,"nadie");
+        this.cargarSprite("Assets/Graficos/tiburonazoPixel.png",2);
         // Configurar rango de ataque más grande
         this.alcanceDePersecucion = 10000; // 10000 unidades de rango
         this.multDePerseguir = 2; // Más agresivo
