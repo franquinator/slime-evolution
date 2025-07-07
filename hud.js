@@ -70,9 +70,9 @@ class Hud {
     }
 
     dibujarBotonDePrueba() {
-        // this.crearBoton("Alternar colisiones", window.innerWidth - 150, 50, () => {
-        //     this.juego.slime.alternarColisiones();
-        // });
+/*         this.crearBoton("Alternar colisiones", window.innerWidth - 150, 50, () => {
+             this.juego.slime.alternarColisiones();
+        }); */
     }
     
     dibujarBarraDeTurbo(){
@@ -205,9 +205,10 @@ class Hud {
         
         // Fondo negro
         const fondo = new PIXI.Graphics();
-        fondo.beginFill(0x000000, 0.9);
+        fondo.beginFill(0x000000, 0.8);
         fondo.drawRect(0, 0, window.innerWidth, window.innerHeight);
         fondo.endFill();
+        fondo.tint = 0x000000;
         
         // Texto principal
         const textoPrincipal = new PIXI.Text(ganado ? "¡FELICIDADES! ¡GANASTE!" : "¡GAME OVER!", {

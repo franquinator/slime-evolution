@@ -22,6 +22,7 @@ class Nivel{
         }
         this.juego.slime.dividir(this.tamaño);
         this.juego.camara.hacerZoom(this.tamaño);
+        this.juego.fondo.ampliar(this.tamaño);
  
         this.juego.escalaDeJuego *= this.tamaño;
         for (let i = 0; i < this.listaNpcs.length; i++) {

@@ -51,9 +51,9 @@ class Pez extends NpcPasivo{
     }
 }
 
-class Tank extends NpcPasivo{
+class Tiburon extends NpcPasivo{
     constructor(posX,posY,juego){
-        super(posX,posY,5000,10,juego,"nadie");
+        super(posX,posY,20000,20,juego,"nadie");
         this.cargarSprite("Assets/Graficos/tiburonazoPixel.png",2);
         // Configurar rango de ataque más grande
         this.alcanceDePersecucion = 10000; // 10000 unidades de rango
@@ -64,7 +64,7 @@ class Tank extends NpcPasivo{
         super.update();
         
         // Perseguir al jugador desde muy lejos
-        if (this.juego.slime) {
+/*         if (this.juego.slime) {
             const distanciaAlJugador = distancia(this.position, this.juego.slime.position);
             if (distanciaAlJugador < this.alcanceDePersecucion) {
                 // Calcular dirección hacia el jugador
@@ -73,7 +73,7 @@ class Tank extends NpcPasivo{
                 // Aplicar fuerza hacia el jugador
                 this.asignarAceleracion(direccion.x * this.multDePerseguir * 100, direccion.y * this.multDePerseguir * 100);
             }
-        }
+        } */
     }
     
     render(){

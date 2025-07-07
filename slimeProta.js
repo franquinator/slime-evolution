@@ -194,6 +194,12 @@ class SlimeProta extends Entidad{
 
         comida.destroy();
 
+        if(comida instanceof Tiburon){
+            console.log("¡VICTORIA! Completaste todos los niveles");
+            this.juego.finalizarJuego(true);
+            return;
+        }
+
         this.juego.hud.actualizarDebug("crecimiento: " + crecimiento);
     }
     crecer(cantidad){
@@ -203,10 +209,9 @@ class SlimeProta extends Entidad{
         // this.collider.setSize(this.radio * 2); // Comentado porque el collider está oculto
 
         const radioNecesario = this.juego.gestorNiveles.radioNivelActual();
-        console.log("Radio actual:", this.radio, "Radio necesario:", radioNecesario);
+        //console.log("Radio actual:", this.radio, "Radio necesario:", radioNecesario);
         
         if(this.radio >= radioNecesario){
-            console.log("¡Subiendo nivel!");
             this.juego.gestorNiveles.subirNivel();
         }
     }
