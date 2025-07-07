@@ -50,3 +50,43 @@ class Pez extends NpcPasivo{
         }
     }
 }
+
+class Tank extends NpcPasivo{
+    constructor(posX,posY,juego){
+        super(posX,posY,8000,10,juego,"nadie");
+        this.cargarSprite("Assets/Graficos/tank.png",2);
+        
+        // Configurar rango de ataque más grande
+        this.alcanceDePersecucion = 10000; // 10000 unidades de rango
+        this.multDePerseguir = 2; // Más agresivo
+    }
+    
+    update() {
+        super.update();
+        
+        // Perseguir al jugador desde muy lejos
+        if (this.juego.slime) {
+            const distanciaAlJugador = distancia(this.position, this.juego.slime.position);
+            if (distanciaAlJugador < this.alcanceDePersecucion) {
+                // Calcular dirección hacia el jugador
+                const direccion = getUnitVector(this.position, this.juego.slime.position);
+                
+                // Aplicar fuerza hacia el jugador
+                this.asignarAceleracion(direccion.x * this.multDePerseguir * 100, direccion.y * this.multDePerseguir * 100);
+            }
+        }
+    }
+    
+    render(){
+        super.render()
+        if(this.sprite == undefined)return;
+        if(this.vel.x > 0){
+            this.container.scale.y = 1;
+            this.sprite.rotation = Math.atan2(this.vel.y, this.vel.x);
+        }
+        else if(this.vel.x < 0){
+            this.container.scale.y = -1;
+            this.sprite.rotation = Math.atan2(-this.vel.y, this.vel.x);
+        }
+    }
+}

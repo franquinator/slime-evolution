@@ -23,7 +23,7 @@ class SlimeProta extends Entidad{
 
         this.colisionesActivas = true;
 
-        this.MostrarCollider();
+        // this.MostrarCollider(); // Comentado: oculta el círculo verde del collider del personaje
     }
 
     async inicializar(){
@@ -159,6 +159,12 @@ class SlimeProta extends Entidad{
 
         for (let i = 0; i < colisiones.length; i++) {
             const npcActual = colisiones[i];
+            
+            // Verificar que la entidad existe y no ha sido eliminada
+            if (!npcActual || npcActual.fuiEliminado) {
+                continue;
+            }
+            
             if(npcActual.radio <= this.radio && !npcActual.fuiEliminado){
                 this.comer(npcActual);
             }
@@ -170,7 +176,7 @@ class SlimeProta extends Entidad{
     }
 
     comer(comida){
-        if(this.sprite == null) return;
+        if(this.sprite == null || comida.fuiEliminado) return;
         
         /*
             si mide mas de 75% sube la cantidad de su masa;
@@ -194,9 +200,13 @@ class SlimeProta extends Entidad{
         this.radio += cantidad;
 
         this.sprite.setSize(this.radio * 2 * this.scaleOffset);
-        this.collider.setSize(this.radio * 2);
+        // this.collider.setSize(this.radio * 2); // Comentado porque el collider está oculto
 
-        if(this.radio >= this.juego.gestorNiveles.radioNivelActual()){
+        const radioNecesario = this.juego.gestorNiveles.radioNivelActual();
+        console.log("Radio actual:", this.radio, "Radio necesario:", radioNecesario);
+        
+        if(this.radio >= radioNecesario){
+            console.log("¡Subiendo nivel!");
             this.juego.gestorNiveles.subirNivel();
         }
     }

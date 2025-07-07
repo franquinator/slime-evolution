@@ -157,6 +157,10 @@ function interpolacionLineal(valorInicial, valorFinal, t) {
   return valorInicial + (valorFinal - valorInicial) * t;
 }
 function colisionan(entidad1, entidad2){
+  // Verificar que ambas entidades existen y tienen las propiedades necesarias
+  if (!entidad1 || !entidad2 || !entidad1.position || !entidad2.position) {
+    return false;
+  }
   return distancia(entidad1.position, entidad2.position) < entidad1.radio + entidad2.radio;
 }
 

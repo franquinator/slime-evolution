@@ -171,25 +171,42 @@ class Juego {
     this.vidas--;
     this.hud.actualizarVidas(this.vidas);
     if (this.vidas <= 0) {
-      alert("¡Perdiste! (Presiona 'R' para reiniciar)");
       this.finalizado = true;
       this.app.stop();
+      this.hud.mostrarGameOver(this.puntos, this.puntuacionAlta);
     }
   }
 
   finalizarJuego(ganado) {
+    console.log("Finalizando juego, ganado:", ganado);
     this.finalizado = true;
-    this.app.stop();
     this.guardarPuntuacionAlta();
     
-    const mensaje = ganado 
-      ? `¡Felicidades! Has ganado con ${this.puntos} puntos.\nPuntuación más alta: ${this.puntuacionAlta}`
-      : `¡Game Over! Puntuación: ${this.puntos}\nPuntuación más alta: ${this.puntuacionAlta}`;
+    if (ganado) {
+      console.log("Mostrando pantalla de victoria");
+      // Mostrar pantalla de victoria
+      this.hud.mostrarGameOver(this.puntos, this.puntuacionAlta, true);
+    } else {
+      console.log("Mostrando pantalla de game over");
+      // Mostrar pantalla de game over
+      this.hud.mostrarGameOver(this.puntos, this.puntuacionAlta, false);
+    }
     
-    alert(mensaje + "\nPresiona 'R' para reiniciar");
+    // Detener el juego después de mostrar el panel
+    setTimeout(() => {
+      this.app.stop();
+    }, 100);
   }
 }
 
 window.reiniciarJuego = function () {
   location.reload(); // recarga la página para reiniciar todo
+};
+
+// Función de prueba para forzar la victoria
+window.forzarVictoria = function() {
+  if (juego) {
+    console.log("Forzando victoria...");
+    juego.finalizarJuego(true);
+  }
 };

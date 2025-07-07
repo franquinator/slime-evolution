@@ -21,6 +21,21 @@ function cerrarJuego() {
     window.close();
 }
 
+function volverAlMenu() {
+    if (juego) {
+        // Detener el juego actual
+        juego.app.stop();
+        juego = null;
+    }
+    // Mostrar el menú principal
+    document.getElementById("menu").style.display = "block";
+    // Limpiar el canvas si existe
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+        canvas.remove();
+    }
+}
+
 // Cerrar paneles al hacer clic fuera de ellos
 window.onclick = function (event) {
     if (event.target == document.getElementById("panelOpciones")) {

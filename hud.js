@@ -12,6 +12,7 @@ class Hud {
         this.textoDeDebug = null;
         this.botones = new Map(); // Para almacenar los botones creados
         this.barraDeTurbo = {graficos: null, porcentaje: 0, anchoMaximo: 0};
+        this.panelGameOver = null;
     }
 
     async inicializar() {
@@ -34,9 +35,9 @@ class Hud {
     }
 
     dibujarContador() {
-        this.contadorDePuntos = new PIXI.Text("Comidos: 0", {
+        this.contadorDePuntos = new PIXI.Text("Puntos: 0", {
             fill: 0xffffff,
-            fontSize: 24,
+            fontSize: 24
         });
         this.contadorDePuntos.position.set(20, 50);
         this.hud.addChild(this.contadorDePuntos);
@@ -69,9 +70,9 @@ class Hud {
     }
 
     dibujarBotonDePrueba() {
-        this.crearBoton("Alternar colisiones", window.innerWidth - 150, 50, () => {
-            this.juego.slime.alternarColisiones();
-        });
+        // this.crearBoton("Alternar colisiones", window.innerWidth - 150, 50, () => {
+        //     this.juego.slime.alternarColisiones();
+        // });
     }
     
     dibujarBarraDeTurbo(){
@@ -113,7 +114,7 @@ class Hud {
 
     actualizarPuntos(cantidad) {
         if (this.contadorDePuntos) {
-            this.contadorDePuntos.text = `Puntoss: ${cantidad}`;
+            this.contadorDePuntos.text = `Puntos: ${cantidad}`;
         }
     }
 
@@ -183,6 +184,8 @@ class Hud {
         
         return boton;
     }
+
+
     
 
     eliminarBoton(texto) {
@@ -191,6 +194,83 @@ class Hud {
             this.hud.removeChild(boton);
             this.botones.delete(texto);
         }
+    }
+
+    mostrarGameOver(puntuacion, puntuacionAlta, ganado = false) {
+        console.log("Mostrando game over - Puntuación:", puntuacion, "Mejor:", puntuacionAlta, "Ganado:", ganado);
+        
+        // Crear el panel de game over
+        this.panelGameOver = new PIXI.Container();
+        this.panelGameOver.zIndex = 2000;
+        
+        // Fondo negro
+        const fondo = new PIXI.Graphics();
+        fondo.beginFill(0x000000, 0.9);
+        fondo.drawRect(0, 0, window.innerWidth, window.innerHeight);
+        fondo.endFill();
+        
+        // Texto principal
+        const textoPrincipal = new PIXI.Text(ganado ? "¡FELICIDADES! ¡GANASTE!" : "¡GAME OVER!", {
+            fontFamily: 'Arial',
+            fontSize: 48,
+            fill: ganado ? 0x00ff00 : 0xff0000
+        });
+        textoPrincipal.anchor.set(0.5);
+        textoPrincipal.position.set(window.innerWidth / 2, window.innerHeight / 2 - 50);
+        
+        // Texto de puntuación
+        const textoPuntuacion = new PIXI.Text(`Puntos: ${puntuacion}`, {
+            fontFamily: 'Arial',
+            fontSize: 32,
+            fill: 0xffffff
+        });
+        textoPuntuacion.anchor.set(0.5);
+        textoPuntuacion.position.set(window.innerWidth / 2, window.innerHeight / 2 + 20);
+        
+        // Texto de puntuación más alta
+        const textoPuntuacionAlta = new PIXI.Text(`Mejor: ${puntuacionAlta}`, {
+            fontFamily: 'Arial',
+            fontSize: 24,
+            fill: 0xffff00
+        });
+        textoPuntuacionAlta.anchor.set(0.5);
+        textoPuntuacionAlta.position.set(window.innerWidth / 2, window.innerHeight / 2 + 60);
+        
+        // Mensaje adicional para victoria
+        if (ganado) {
+            const mensajeVictoria = new PIXI.Text("¡Completaste todos los niveles!", {
+                fontFamily: 'Arial',
+                fontSize: 20,
+                fill: 0x00ff00
+            });
+            mensajeVictoria.anchor.set(0.5);
+            mensajeVictoria.position.set(window.innerWidth / 2, window.innerHeight / 2 + 90);
+            this.panelGameOver.addChild(mensajeVictoria);
+        }
+        
+        // Botón reiniciar
+        const botonReiniciar = new PIXI.Text("REINICIAR", {
+            fontFamily: 'Arial',
+            fontSize: 24,
+            fill: 0xff0000
+        });
+        botonReiniciar.anchor.set(0.5);
+        botonReiniciar.position.set(window.innerWidth / 2, window.innerHeight / 2 + 120);
+        botonReiniciar.eventMode = 'static';
+        botonReiniciar.cursor = 'pointer';
+        botonReiniciar.on('pointerdown', () => {
+            window.reiniciarJuego();
+        });
+        
+        // Agregar elementos
+        this.panelGameOver.addChild(fondo);
+        this.panelGameOver.addChild(textoPrincipal);
+        this.panelGameOver.addChild(textoPuntuacion);
+        this.panelGameOver.addChild(textoPuntuacionAlta);
+        this.panelGameOver.addChild(botonReiniciar);
+        
+        this.hud.addChild(this.panelGameOver);
+        console.log("Panel de game over agregado al HUD");
     }
 }
 

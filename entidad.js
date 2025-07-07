@@ -123,6 +123,6 @@ class Entidad {
         this.fuiEliminado = true;
         this.juego.npcManager.eliminarEntidad(this);
         this.container.destroy();
-        this.juego.app.stage.removeChild(this);
+        // this.juego.app.stage.removeChild(this); // Comentado: esto causaba errores
     }
 }
